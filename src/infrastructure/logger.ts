@@ -1,0 +1,99 @@
+import * as fs from "fs";
+import * as path from "path";
+
+export interface VectorlessLogger {
+  sessionId: string;
+  logPath: string;
+  debug(component: string, message: string, data?: unknown): void;
+  info(component: string, message: string, data?: unknown): void;
+  warn(component: string, message: string, data?: unknown): void;
+  error(component: string, message: string, data?: unknown): void;
+  raw(component: string, label: string, content: string): void;
+}
+
+function formatTimestamp(): string {
+  return new Date().toISOString();
+}
+
+function formatLogEntry(
+  level: string,
+  component: string,
+  message: string,
+  data?: unknown,
+): string {
+  const timestamp = formatTimestamp();
+  let entry = `[${timestamp}] [${level}] [${component}] ${message}`;
+  if (data !== undefined) {
+    entry += `\n  DATA: ${JSON.stringify(data, null, 2).split("\n").join("\n  ")}`;
+  }
+  return entry + "\n";
+}
+
+export function createSessionLogger(
+  sessionId: string,
+  logsDir?: string,
+): VectorlessLogger {
+  const dir = logsDir || process.env.VECTORLESS_LOGS_DIR || "./vectorless-logs";
+
+  // Create logs directory if it doesn't exist
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+
+  const logPath = path.join(dir, `vectorless-${sessionId}.log`);
+
+  // Write session start
+  const startEntry = formatLogEntry(
+    "INFO",
+    "SESSION",
+    `=== Session ${sessionId} started ===`,
+  );
+  fs.appendFileSync(logPath, startEntry);
+
+  function writeLog(
+    level: string,
+    component: string,
+    message: string,
+    data?: unknown,
+  ): void {
+    const entry = formatLogEntry(level, component, message, data);
+    fs.appendFileSync(logPath, entry);
+  }
+
+  return {
+    sessionId,
+    logPath,
+
+    debug(component: string, message: string, data?: unknown): void {
+      writeLog("DEBUG", component, message, data);
+    },
+
+    info(component: string, message: string, data?: unknown): void {
+      writeLog("INFO", component, message, data);
+    },
+
+    warn(component: string, message: string, data?: unknown): void {
+      writeLog("WARN", component, message, data);
+    },
+
+    error(component: string, message: string, data?: unknown): void {
+      writeLog("ERROR", component, message, data);
+    },
+
+    raw(component: string, label: string, content: string): void {
+      const timestamp = formatTimestamp();
+      const entry = `[${timestamp}] [RAW] [${component}] ${label}\n--- BEGIN ---\n${content}\n--- END ---\n\n`;
+      fs.appendFileSync(logPath, entry);
+    },
+  };
+}
+
+// Global logger for when session is not yet created
+let globalLogger: VectorlessLogger | null = null;
+
+export function getGlobalLogger(): VectorlessLogger {
+  if (!globalLogger) {
+    globalLogger = createSessionLogger("global");
+  }
+  return globalLogger;
+}

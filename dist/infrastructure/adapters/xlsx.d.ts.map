@@ -1,0 +1,1 @@
+{"version":3,"file":"xlsx.d.ts","sourceRoot":"","sources":["../../../src/infrastructure/adapters/xlsx.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EAAE,eAAe,EAAE,IAAI,EAAE,MAAM,sBAAsB,CAAC;AAElE,qBAAa,WAAY,YAAW,eAAe;IAC3C,YAAY,CAAC,MAAM,EAAE,WAAW,GAAG,OAAO,CAAC,IAAI,EAAE,CAAC;CAqBzD"}

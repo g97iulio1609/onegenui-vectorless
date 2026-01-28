@@ -1,0 +1,65 @@
+{
+  "name": "@onegenui/vectorless",
+  "version": "3.0.0",
+  "description": "OneGenUI adapter for Vectorless - AI-powered document structure extraction",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./tools": {
+      "import": "./dist/tools.js",
+      "types": "./dist/tools.d.ts"
+    },
+    "./hooks": {
+      "import": "./dist/hooks/index.js",
+      "types": "./dist/hooks/index.d.ts"
+    },
+    "./adapters": {
+      "import": "./dist/adapters/index.js",
+      "types": "./dist/adapters/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "vectorless": "workspace:*",
+    "ai": "^6.0.0",
+    "jszip": "^3.10.1",
+    "mammoth": "^1.8.0",
+    "marked": "^15.0.0",
+    "officegen": "^0.6.5",
+    "pdf-parse": "^1.1.1",
+    "pptx2json": "^0.0.10",
+    "xlsx": "^0.18.5",
+    "zod": "^3.24.1"
+  },
+  "peerDependencies": {
+    "@onegenui/mcp": "workspace:*",
+    "@onegenui/providers": "workspace:*",
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^22.0.0",
+    "@types/react": "^18.2.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

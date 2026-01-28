@@ -1,0 +1,1 @@
+{"version":3,"file":"types.d.ts","sourceRoot":"","sources":["../../../src/agents/toc-verifier/types.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,kBAAkB;IACjC,MAAM,EAAE,MAAM,CAAC;IACf,KAAK,EAAE,MAAM,CAAC;IACd,SAAS,EAAE,MAAM,CAAC;IAClB,QAAQ,EAAE,OAAO,CAAC;IAClB,UAAU,EAAE,MAAM,CAAC;IACnB,cAAc,CAAC,EAAE,OAAO,CAAC;CAC1B"}

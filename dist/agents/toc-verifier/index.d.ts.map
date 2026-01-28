@@ -1,0 +1,1 @@
+{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../../../src/agents/toc-verifier/index.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,iBAAiB,EAAE,sBAAsB,EAAE,MAAM,gBAAgB,CAAC;AAC3E,OAAO,EACL,wBAAwB,EACxB,wBAAwB,EACxB,KAAK,aAAa,EAClB,KAAK,iBAAiB,GACvB,MAAM,gBAAgB,CAAC;AACxB,OAAO,EAAE,gBAAgB,EAAE,iBAAiB,EAAE,MAAM,aAAa,CAAC;AAClE,YAAY,EAAE,kBAAkB,EAAE,MAAM,SAAS,CAAC"}

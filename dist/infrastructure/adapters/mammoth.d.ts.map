@@ -1,0 +1,1 @@
+{"version":3,"file":"mammoth.d.ts","sourceRoot":"","sources":["../../../src/infrastructure/adapters/mammoth.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EAAE,cAAc,EAAE,IAAI,EAAE,MAAM,sBAAsB,CAAC;AAEjE,qBAAa,cAAe,YAAW,cAAc;IAC7C,YAAY,CAAC,MAAM,EAAE,WAAW,GAAG,OAAO,CAAC,IAAI,EAAE,CAAC;CA8BzD"}

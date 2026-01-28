@@ -1,0 +1,1 @@
+{"version":3,"file":"pptx.d.ts","sourceRoot":"","sources":["../../../src/infrastructure/adapters/pptx.ts"],"names":[],"mappings":"AAAA;;;GAGG;AAEH,OAAO,KAAK,EAAE,oBAAoB,EAAE,IAAI,EAAE,MAAM,sBAAsB,CAAC;AAEvE,qBAAa,iBAAkB,YAAW,oBAAoB;IACtD,YAAY,CAAC,MAAM,EAAE,WAAW,GAAG,OAAO,CAAC,IAAI,EAAE,CAAC;IA4BxD,OAAO,CAAC,kBAAkB;CA0B3B"}

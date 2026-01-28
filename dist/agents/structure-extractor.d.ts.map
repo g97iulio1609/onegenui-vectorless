@@ -1,0 +1,1 @@
+{"version":3,"file":"structure-extractor.d.ts","sourceRoot":"","sources":["../../src/agents/structure-extractor.ts"],"names":[],"mappings":"AAAA,OAAO,EAKL,KAAK,aAAa,EACnB,MAAM,IAAI,CAAC;AAQZ,OAAO,KAAK,EAAQ,sBAAsB,EAAE,MAAM,mBAAmB,CAAC;AACtE,OAAO,EAEL,KAAK,gBAAgB,EACtB,MAAM,6BAA6B,CAAC;AA4DrC,wBAAgB,6BAA6B,CAC3C,KAAK,EAAE,aAAa,EACpB,MAAM,CAAC,EAAE,gBAAgB,GACxB,sBAAsB,CAqNxB"}
