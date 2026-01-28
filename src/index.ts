@@ -209,8 +209,9 @@ export {
   type PostgresClient,
 } from "./adapters/index.js";
 
-// React hooks (for users with React)
-export * from "./hooks/index.js";
+// NOTE: React hooks are NOT exported from main entry point to avoid
+// importing React in server contexts. Use:
+//   import { useTreeSearch } from "@onegenui/vectorless/hooks";
 
 // Re-export core types from vectorless
 export type {

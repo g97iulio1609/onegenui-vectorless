@@ -87,8 +87,6 @@ export * from "./infrastructure/index.js";
 export * from "./use-cases/index.js";
 // PostgreSQL adapters for production
 export { PostgresKBRepository, createPostgresKBRepository, CREATE_KB_TABLE_SQL, PostgresPreferenceStore, createPostgresPreferenceStore, CREATE_PREFERENCE_TABLES_SQL, } from "./adapters/index.js";
-// React hooks (for users with React)
-export * from "./hooks/index.js";
 // Re-export core factories
 export { createTreeSearchOrchestrator, createMultiDocSearchAgent, createQueryClassifierAgent, createGreedySearchAgent, createMCTSSearchAgent, createContentExtractorAgent, createMultiNodeAggregatorAgent, createMemoryPreferenceStore, getDomainTemplate, listDomainTemplates, DOMAIN_TEMPLATES, LEGAL_TEMPLATE, MEDICAL_TEMPLATE, TECHNICAL_TEMPLATE, ACADEMIC_TEMPLATE, FINANCIAL_TEMPLATE, VERSION as VECTORLESS_VERSION, } from "vectorless";
 //# sourceMappingURL=index.js.map
