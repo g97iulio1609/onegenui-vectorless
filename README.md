@@ -21,7 +21,7 @@ import { generatePageIndex } from "@onegenui/vectorless";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 
 const google = createGoogleGenerativeAI({ apiKey: process.env.GOOGLE_API_KEY });
-const model = google("gemini-2.0-flash-exp");
+const model = google("gemini-3-flash-preview-exp");
 
 const pdfBuffer = fs.readFileSync("document.pdf");
 const result = await generatePageIndex(pdfBuffer, { model });

@@ -85,6 +85,8 @@ export * from "./ports/index.js";
 export * from "./agents/index.js";
 export * from "./infrastructure/index.js";
 export * from "./use-cases/index.js";
+export * from "./formatters/index.js";
+export * from "./search/index.js";
 // PostgreSQL adapters for production
 export { PostgresKBRepository, createPostgresKBRepository, CREATE_KB_TABLE_SQL, PostgresPreferenceStore, createPostgresPreferenceStore, CREATE_PREFERENCE_TABLES_SQL, } from "./adapters/index.js";
 // Re-export core factories
