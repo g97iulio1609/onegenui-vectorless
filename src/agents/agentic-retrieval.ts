@@ -271,7 +271,7 @@ After gathering information, output ONLY the JSON object.`;
         nodeId,
         title: node.title,
         pages: `${node.pageStart}-${node.pageEnd}`,
-        content: content.slice(0, 8000),
+        content: content.slice(0, 50000),
         summary: node.summary,
       };
     },

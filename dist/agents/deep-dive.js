@@ -59,7 +59,7 @@ PAGES: ${targetNode.pageStart}-${targetNode.pageEnd}
 CURRENT SUMMARY: ${targetNode.summary}
 
 FULL TEXT:
-${nodeText.slice(0, 8000)}
+${nodeText.slice(0, 50000)}
 
 Provide:
 1. A detailed summary (2-3 paragraphs)
