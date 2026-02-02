@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// Legacy TreeNode (backward compatible)
+// TreeNode schema for document structure
 export const TreeNodeSchema: z.ZodType<TreeNode> = z.lazy(() =>
   z.object({
     id: z.string().optional().describe("Unique identifier for this node"),
