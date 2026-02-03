@@ -11,23 +11,7 @@ export declare const pdfIndexParamsSchema: z.ZodObject<{
     verifyToc: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     fixIncorrectToc: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     processLargeNodes: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
-}, "strip", z.ZodTypeAny, {
-    addSummaries: boolean;
-    addDescription: boolean;
-    verifyToc: boolean;
-    fixIncorrectToc: boolean;
-    processLargeNodes: boolean;
-    pdfUrl?: string | undefined;
-    pdfBase64?: string | undefined;
-}, {
-    addSummaries?: boolean | undefined;
-    addDescription?: boolean | undefined;
-    verifyToc?: boolean | undefined;
-    fixIncorrectToc?: boolean | undefined;
-    processLargeNodes?: boolean | undefined;
-    pdfUrl?: string | undefined;
-    pdfBase64?: string | undefined;
-}>;
+}, z.core.$strip>;
 export type PdfIndexParams = z.infer<typeof pdfIndexParamsSchema>;
 export declare const pdfIndexToolDefinition: {
     name: "pdf-index";
@@ -40,23 +24,7 @@ export declare const pdfIndexToolDefinition: {
         verifyToc: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
         fixIncorrectToc: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
         processLargeNodes: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
-    }, "strip", z.ZodTypeAny, {
-        addSummaries: boolean;
-        addDescription: boolean;
-        verifyToc: boolean;
-        fixIncorrectToc: boolean;
-        processLargeNodes: boolean;
-        pdfUrl?: string | undefined;
-        pdfBase64?: string | undefined;
-    }, {
-        addSummaries?: boolean | undefined;
-        addDescription?: boolean | undefined;
-        verifyToc?: boolean | undefined;
-        fixIncorrectToc?: boolean | undefined;
-        processLargeNodes?: boolean | undefined;
-        pdfUrl?: string | undefined;
-        pdfBase64?: string | undefined;
-    }>;
+    }, z.core.$strip>;
     domain: "document";
     tags: string[];
 };
@@ -71,27 +39,7 @@ export declare const knowledgeBaseParamsSchema: z.ZodObject<{
     extractQuotes: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     extractKeywords: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     extractCitations: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
-}, "strip", z.ZodTypeAny, {
-    filename: string;
-    mimeType: string;
-    extractEntities: boolean;
-    extractRelations: boolean;
-    extractQuotes: boolean;
-    extractKeywords: boolean;
-    extractCitations: boolean;
-    url?: string | undefined;
-    base64Content?: string | undefined;
-}, {
-    filename: string;
-    mimeType?: string | undefined;
-    extractEntities?: boolean | undefined;
-    extractRelations?: boolean | undefined;
-    extractQuotes?: boolean | undefined;
-    extractKeywords?: boolean | undefined;
-    extractCitations?: boolean | undefined;
-    url?: string | undefined;
-    base64Content?: string | undefined;
-}>;
+}, z.core.$strip>;
 export type KnowledgeBaseParams = z.infer<typeof knowledgeBaseParamsSchema>;
 export declare const knowledgeBaseToolDefinition: {
     name: "generate-knowledge-base";
@@ -106,27 +54,7 @@ export declare const knowledgeBaseToolDefinition: {
         extractQuotes: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
         extractKeywords: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
         extractCitations: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
-    }, "strip", z.ZodTypeAny, {
-        filename: string;
-        mimeType: string;
-        extractEntities: boolean;
-        extractRelations: boolean;
-        extractQuotes: boolean;
-        extractKeywords: boolean;
-        extractCitations: boolean;
-        url?: string | undefined;
-        base64Content?: string | undefined;
-    }, {
-        filename: string;
-        mimeType?: string | undefined;
-        extractEntities?: boolean | undefined;
-        extractRelations?: boolean | undefined;
-        extractQuotes?: boolean | undefined;
-        extractKeywords?: boolean | undefined;
-        extractCitations?: boolean | undefined;
-        url?: string | undefined;
-        base64Content?: string | undefined;
-    }>;
+    }, z.core.$strip>;
     domain: "document";
     tags: string[];
 };
@@ -136,17 +64,7 @@ export declare const questionAnswerParamsSchema: z.ZodObject<{
     knowledgeBaseId: z.ZodString;
     maxSources: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     minConfidence: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
-}, "strip", z.ZodTypeAny, {
-    question: string;
-    knowledgeBaseId: string;
-    maxSources: number;
-    minConfidence: number;
-}, {
-    question: string;
-    knowledgeBaseId: string;
-    maxSources?: number | undefined;
-    minConfidence?: number | undefined;
-}>;
+}, z.core.$strip>;
 export type QuestionAnswerParams = z.infer<typeof questionAnswerParamsSchema>;
 export declare const questionAnswerToolDefinition: {
     name: "answer-question";
@@ -156,28 +74,18 @@ export declare const questionAnswerToolDefinition: {
         knowledgeBaseId: z.ZodString;
         maxSources: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
         minConfidence: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
-    }, "strip", z.ZodTypeAny, {
-        question: string;
-        knowledgeBaseId: string;
-        maxSources: number;
-        minConfidence: number;
-    }, {
-        question: string;
-        knowledgeBaseId: string;
-        maxSources?: number | undefined;
-        minConfidence?: number | undefined;
-    }>;
+    }, z.core.$strip>;
     domain: "document";
     tags: string[];
 };
 export declare function executeQuestionAnswer(params: QuestionAnswerParams): Promise<{
     answer: Answer;
 }>;
-export declare const listKnowledgeBasesParamsSchema: z.ZodObject<{}, "strip", z.ZodTypeAny, {}, {}>;
+export declare const listKnowledgeBasesParamsSchema: z.ZodObject<{}, z.core.$strip>;
 export declare const listKnowledgeBasesToolDefinition: {
     name: "list-knowledge-bases";
     description: string;
-    parameters: z.ZodObject<{}, "strip", z.ZodTypeAny, {}, {}>;
+    parameters: z.ZodObject<{}, z.core.$strip>;
     domain: "document";
     tags: string[];
 };
@@ -227,23 +135,7 @@ export declare const vectorlessTools: {
             verifyToc: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
             fixIncorrectToc: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
             processLargeNodes: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
-        }, "strip", z.ZodTypeAny, {
-            addSummaries: boolean;
-            addDescription: boolean;
-            verifyToc: boolean;
-            fixIncorrectToc: boolean;
-            processLargeNodes: boolean;
-            pdfUrl?: string | undefined;
-            pdfBase64?: string | undefined;
-        }, {
-            addSummaries?: boolean | undefined;
-            addDescription?: boolean | undefined;
-            verifyToc?: boolean | undefined;
-            fixIncorrectToc?: boolean | undefined;
-            processLargeNodes?: boolean | undefined;
-            pdfUrl?: string | undefined;
-            pdfBase64?: string | undefined;
-        }>;
+        }, z.core.$strip>;
         domain: "document";
         tags: string[];
     };
@@ -261,27 +153,7 @@ export declare const vectorlessTools: {
             extractQuotes: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
             extractKeywords: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
             extractCitations: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
-        }, "strip", z.ZodTypeAny, {
-            filename: string;
-            mimeType: string;
-            extractEntities: boolean;
-            extractRelations: boolean;
-            extractQuotes: boolean;
-            extractKeywords: boolean;
-            extractCitations: boolean;
-            url?: string | undefined;
-            base64Content?: string | undefined;
-        }, {
-            filename: string;
-            mimeType?: string | undefined;
-            extractEntities?: boolean | undefined;
-            extractRelations?: boolean | undefined;
-            extractQuotes?: boolean | undefined;
-            extractKeywords?: boolean | undefined;
-            extractCitations?: boolean | undefined;
-            url?: string | undefined;
-            base64Content?: string | undefined;
-        }>;
+        }, z.core.$strip>;
         domain: "document";
         tags: string[];
     };
@@ -294,17 +166,7 @@ export declare const vectorlessTools: {
             knowledgeBaseId: z.ZodString;
             maxSources: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
             minConfidence: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
-        }, "strip", z.ZodTypeAny, {
-            question: string;
-            knowledgeBaseId: string;
-            maxSources: number;
-            minConfidence: number;
-        }, {
-            question: string;
-            knowledgeBaseId: string;
-            maxSources?: number | undefined;
-            minConfidence?: number | undefined;
-        }>;
+        }, z.core.$strip>;
         domain: "document";
         tags: string[];
     };
@@ -312,7 +174,7 @@ export declare const vectorlessTools: {
         execute: typeof executeListKnowledgeBases;
         name: "list-knowledge-bases";
         description: string;
-        parameters: z.ZodObject<{}, "strip", z.ZodTypeAny, {}, {}>;
+        parameters: z.ZodObject<{}, z.core.$strip>;
         domain: "document";
         tags: string[];
     };
