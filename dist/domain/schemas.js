@@ -138,7 +138,7 @@ export const SSEEventTypeSchema = z.enum([
 export const SSEEventSchema = z.object({
     type: SSEEventTypeSchema.describe("Event type"),
     timestamp: z.string().datetime().describe("When this event occurred"),
-    data: z.record(z.unknown()).optional().describe("Event-specific payload"),
+    data: z.record(z.string(), z.unknown()).optional().describe("Event-specific payload"),
 });
 // ============== EXPORTED TYPES FOR PORTS ==============
 // Entity type enum

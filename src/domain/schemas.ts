@@ -189,7 +189,7 @@ export type SSEEventType = z.infer<typeof SSEEventTypeSchema>;
 export const SSEEventSchema = z.object({
   type: SSEEventTypeSchema.describe("Event type"),
   timestamp: z.string().datetime().describe("When this event occurred"),
-  data: z.record(z.unknown()).optional().describe("Event-specific payload"),
+  data: z.record(z.string(), z.unknown()).optional().describe("Event-specific payload"),
 });
 
 export type SSEEvent = z.infer<typeof SSEEventSchema>;
