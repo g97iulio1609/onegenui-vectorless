@@ -13,7 +13,7 @@ function formatLogEntry(level, component, message, data) {
 const isNodeEnv = typeof process !== "undefined" &&
     typeof process.versions !== "undefined" &&
     process.versions.node !== undefined;
-export function createSessionLogger(sessionId, logsDir) {
+export function createSessionLogger(sessionId, logsDir, logFile) {
     // In non-Node environments (Edge, browser), use console logging
     if (!isNodeEnv) {
         return createConsoleLogger(sessionId);
@@ -23,12 +23,17 @@ export function createSessionLogger(sessionId, logsDir) {
         /* eslint-disable @typescript-eslint/no-var-requires */
         const fs = require("fs");
         const path = require("path");
-        const dir = logsDir || process.env.VECTORLESS_LOGS_DIR || "./vectorless-logs";
-        // Create logs directory if it doesn't exist
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
+        let logPath;
+        if (logFile) {
+            logPath = logFile;
         }
-        const logPath = path.join(dir, `vectorless-${sessionId}.log`);
+        else {
+            const dir = logsDir || process.env.VECTORLESS_LOGS_DIR || "./vectorless-logs";
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
+            logPath = path.join(dir, `vectorless-${sessionId}.log`);
+        }
         // Write session start
         const startEntry = formatLogEntry("INFO", "SESSION", `=== Session ${sessionId} started ===`);
         fs.appendFileSync(logPath, startEntry + "\n");
@@ -88,7 +93,9 @@ function createConsoleLogger(sessionId) {
 let globalLogger = null;
 export function getGlobalLogger() {
     if (!globalLogger) {
-        globalLogger = createSessionLogger("global");
+        // Write to same file as dashboard logger for unified debugging
+        const logFile = process.env.VECTORLESS_LOG_FILE || "./vectorless.log";
+        globalLogger = createSessionLogger("global", undefined, logFile);
     }
     return globalLogger;
 }

@@ -12,6 +12,10 @@ import type {
 } from "vectorless";
 
 import type { AgenticRetrievalResult } from "../agents/agentic-retrieval.js";
+import type {
+  DocumentReport,
+  ReportSection,
+} from "../domain/document-report.schema.js";
 
 // Types for search results (shared between packages)
 export interface SearchResult {
@@ -317,4 +321,171 @@ export function formatAgenticResultForPrompt(
   }
 
   return lines.join("\n");
+}
+
+/**
+ * Format DocumentReport structured data for LLM prompt context.
+ * Includes sections with summaries, entities, timeline, relations,
+ * key insights, and quotes - everything the LLM needs to generate
+ * rich UI components.
+ */
+export function formatDocumentReportForPrompt(
+  report: DocumentReport,
+): string {
+  const lines: string[] = [];
+
+  lines.push("=".repeat(60));
+  lines.push("DOCUMENT DEEP ANALYSIS");
+  lines.push("=".repeat(60));
+  lines.push("");
+  lines.push(`Title: ${report.title}`);
+  lines.push(`Description: ${report.description}`);
+  lines.push(`Total Pages: ${report.totalPages}`);
+  if (report.filename) lines.push(`File: ${report.filename}`);
+  lines.push("");
+
+  // Section structure with summaries and key points
+  if (report.sections.length > 0) {
+    lines.push("-".repeat(40));
+    lines.push("DOCUMENT SECTIONS (detailed analysis)");
+    lines.push("-".repeat(40));
+    lines.push("");
+    for (const section of report.sections) {
+      formatSectionForPrompt(section, lines, 0);
+    }
+  }
+
+  // Semantic overlay data
+  const overlay = report.semanticOverlay;
+  if (overlay) {
+    // Key insights
+    if (overlay.keyInsights.length > 0) {
+      lines.push("-".repeat(40));
+      lines.push("KEY INSIGHTS");
+      lines.push("-".repeat(40));
+      for (const insight of overlay.keyInsights) {
+        lines.push(`- ${insight}`);
+      }
+      lines.push("");
+    }
+
+    // Entities
+    if (overlay.topEntities.length > 0) {
+      lines.push("-".repeat(40));
+      lines.push("EXTRACTED ENTITIES");
+      lines.push("-".repeat(40));
+      const byType = new Map<string, typeof overlay.topEntities>();
+      for (const e of overlay.topEntities) {
+        if (!byType.has(e.type)) byType.set(e.type, []);
+        byType.get(e.type)!.push(e);
+      }
+      for (const [type, entities] of byType) {
+        lines.push(`\n**${type.toUpperCase()}:**`);
+        for (const e of entities.slice(0, 10)) {
+          const desc = e.description ? `: ${e.description}` : "";
+          lines.push(`  - ${e.value}${desc} (${e.occurrenceCount}x, importance: ${Math.round(e.importance)}%)`);
+        }
+      }
+      lines.push("");
+    }
+
+    // Relations
+    if (overlay.relations.length > 0) {
+      lines.push("-".repeat(40));
+      lines.push("RELATIONSHIPS");
+      lines.push("-".repeat(40));
+      for (const r of overlay.relations) {
+        lines.push(`  ${r.sourceTitle} --[${r.type}]--> ${r.targetTitle}`);
+        if (r.evidence) lines.push(`    Evidence: ${r.evidence}`);
+      }
+      lines.push("");
+    }
+
+    // Timeline
+    if (overlay.timeline && overlay.timeline.length > 0) {
+      lines.push("-".repeat(40));
+      lines.push("TIMELINE OF EVENTS");
+      lines.push("-".repeat(40));
+      for (const evt of overlay.timeline) {
+        lines.push(`  [${evt.date}] ${evt.event} (p.${evt.pageRef})`);
+      }
+      lines.push("");
+    }
+
+    // Key quotes
+    if (overlay.globalQuotes.length > 0) {
+      lines.push("-".repeat(40));
+      lines.push("KEY QUOTES");
+      lines.push("-".repeat(40));
+      for (const q of overlay.globalQuotes) {
+        const speaker = q.speaker ? ` - ${q.speaker}` : "";
+        lines.push(`  > "${q.text}"${speaker}`);
+      }
+      lines.push("");
+    }
+
+    // Concept map
+    if (overlay.conceptMap && overlay.conceptMap.length > 0) {
+      lines.push("-".repeat(40));
+      lines.push("CONCEPT MAP");
+      lines.push("-".repeat(40));
+      for (const c of overlay.conceptMap) {
+        lines.push(`  ${c.concept} --> ${c.relatedConcepts.join(", ")}`);
+      }
+      lines.push("");
+    }
+  }
+
+  // Processing stats
+  if (report.processingStats) {
+    lines.push("-".repeat(40));
+    lines.push("ANALYSIS STATS");
+    lines.push("-".repeat(40));
+    lines.push(`  Sections analyzed: ${report.processingStats.sectionsAnalyzed}`);
+    lines.push(`  Entities extracted: ${report.processingStats.entitiesExtracted}`);
+    lines.push(`  Relations found: ${report.processingStats.relationsFound}`);
+    lines.push("");
+  }
+
+  lines.push("=".repeat(60));
+  return lines.join("\n");
+}
+
+function formatSectionForPrompt(
+  section: ReportSection,
+  lines: string[],
+  depth: number,
+): void {
+  const indent = "  ".repeat(depth);
+  lines.push(`${indent}## ${section.title} (p.${section.pageStart}-${section.pageEnd})`);
+
+  if (section.summary) {
+    lines.push(`${indent}   ${section.summary}`);
+  }
+
+  if (section.keyPoints.length > 0) {
+    for (const point of section.keyPoints) {
+      lines.push(`${indent}   - ${point}`);
+    }
+  }
+
+  if (section.entities.length > 0) {
+    const entityLabels = section.entities.map(e => `${e.value} (${e.type})`).join(", ");
+    lines.push(`${indent}   Entities: ${entityLabels}`);
+  }
+
+  if (section.quotes.length > 0) {
+    for (const q of section.quotes) {
+      const speaker = q.speaker ? ` - ${q.speaker}` : "";
+      lines.push(`${indent}   > "${q.text}"${speaker}`);
+    }
+  }
+
+  lines.push("");
+
+  if (section.children) {
+    for (const child of section.children) {
+      formatSectionForPrompt(child, lines, depth + 1);
+    }
+  }
 }

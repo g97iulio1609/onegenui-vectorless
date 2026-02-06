@@ -295,3 +295,14 @@ export const vectorlessTools = {
     execute: executeListKnowledgeBases,
   },
 };
+
+// Re-export document-report tool
+export {
+  documentReportParamsSchema,
+  documentReportToolDefinition,
+  executeDocumentReport,
+  createDocumentReportMcpTool,
+  setDocumentReportModel,
+  type DocumentReportParams,
+  type DocumentReportToolOptions,
+} from "./tools/index.js";

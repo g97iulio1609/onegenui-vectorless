@@ -35,6 +35,7 @@ const isNodeEnv =
 export function createSessionLogger(
   sessionId: string,
   logsDir?: string,
+  logFile?: string,
 ): VectorlessLogger {
   // In non-Node environments (Edge, browser), use console logging
   if (!isNodeEnv) {
@@ -47,14 +48,16 @@ export function createSessionLogger(
     const fs = require("fs");
     const path = require("path");
 
-    const dir = logsDir || process.env.VECTORLESS_LOGS_DIR || "./vectorless-logs";
-
-    // Create logs directory if it doesn't exist
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+    let logPath: string;
+    if (logFile) {
+      logPath = logFile;
+    } else {
+      const dir = logsDir || process.env.VECTORLESS_LOGS_DIR || "./vectorless-logs";
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      logPath = path.join(dir, `vectorless-${sessionId}.log`);
     }
-
-    const logPath = path.join(dir, `vectorless-${sessionId}.log`);
 
     // Write session start
     const startEntry = formatLogEntry(
@@ -138,7 +141,9 @@ let globalLogger: VectorlessLogger | null = null;
 
 export function getGlobalLogger(): VectorlessLogger {
   if (!globalLogger) {
-    globalLogger = createSessionLogger("global");
+    // Write to same file as dashboard logger for unified debugging
+    const logFile = process.env.VECTORLESS_LOG_FILE || "./vectorless.log";
+    globalLogger = createSessionLogger("global", undefined, logFile);
   }
   return globalLogger;
 }

@@ -80,13 +80,36 @@ export async function generateKnowledgeBase(buffer, filename, mimeType, options)
         },
     });
 }
+import { GenerateDocumentReportUseCase } from "./use-cases/generate-document-report.js";
+export async function generateDocumentReport(buffer, filename, mimeType, options) {
+    const docBuffer = buffer instanceof ArrayBuffer ? buffer : new Uint8Array(buffer).buffer;
+    const useCase = new GenerateDocumentReportUseCase({
+        parser: globalParser,
+        cache: globalCache,
+        model: options.model,
+        onEvent: options.onEvent,
+        onPatch: options.onPatch,
+    });
+    return useCase.execute({
+        buffer: docBuffer,
+        filename,
+        mimeType,
+        options: {
+            includeSemanticOverlay: options.includeSemanticOverlay ?? true,
+            generateTimeline: options.generateTimeline ?? true,
+            generateConceptMap: options.generateConceptMap ?? false,
+        },
+    });
+}
 export * from "./domain/schemas.js";
+export * from "./domain/document-report.schema.js";
 export * from "./ports/index.js";
 export * from "./agents/index.js";
 export * from "./infrastructure/index.js";
 export * from "./use-cases/index.js";
 export * from "./formatters/index.js";
 export * from "./search/index.js";
+export * from "./tools/index.js";
 // PostgreSQL adapters for production
 export { PostgresKBRepository, createPostgresKBRepository, CREATE_KB_TABLE_SQL, PostgresPreferenceStore, createPostgresPreferenceStore, CREATE_PREFERENCE_TABLES_SQL, } from "./adapters/index.js";
 // Re-export core factories

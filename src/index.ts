@@ -177,6 +177,58 @@ export async function generateKnowledgeBase(
   });
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Document Report - Detailed streaming document analysis
+// ─────────────────────────────────────────────────────────────────────────────
+
+import type { DocumentReport, DocumentReportEvent } from "./domain/document-report.schema.js";
+import { GenerateDocumentReportUseCase } from "./use-cases/generate-document-report.js";
+
+export interface DocumentReportOptions {
+  model: LanguageModel;
+  includeSemanticOverlay?: boolean;
+  generateTimeline?: boolean;
+  generateConceptMap?: boolean;
+  onEvent?: (event: DocumentReportEvent) => void;
+  onPatch?: (patch: string) => void;
+}
+
+export interface DocumentReportResult {
+  report: DocumentReport;
+  cached: boolean;
+}
+
+export async function generateDocumentReport(
+  buffer: Buffer | ArrayBuffer,
+  filename: string,
+  mimeType: string,
+  options: DocumentReportOptions,
+): Promise<DocumentReportResult> {
+  const docBuffer: ArrayBuffer =
+    buffer instanceof ArrayBuffer ? buffer : new Uint8Array(buffer).buffer;
+
+  const useCase = new GenerateDocumentReportUseCase({
+    parser: globalParser,
+    cache: globalCache,
+    model: options.model,
+    onEvent: options.onEvent,
+    onPatch: options.onPatch,
+  });
+
+  return useCase.execute({
+    buffer: docBuffer,
+    filename,
+    mimeType,
+    options: {
+      includeSemanticOverlay: options.includeSemanticOverlay ?? true,
+      generateTimeline: options.generateTimeline ?? true,
+      generateConceptMap: options.generateConceptMap ?? false,
+    },
+  });
+}
+
+export type { DocumentReport, DocumentReportEvent };
+
 // Re-export types for convenience
 export type {
   DocumentIndex,
@@ -193,12 +245,14 @@ export type {
   Page,
 };
 export * from "./domain/schemas.js";
+export * from "./domain/document-report.schema.js";
 export * from "./ports/index.js";
 export * from "./agents/index.js";
 export * from "./infrastructure/index.js";
 export * from "./use-cases/index.js";
 export * from "./formatters/index.js";
 export * from "./search/index.js";
+export * from "./tools/index.js";
 
 // PostgreSQL adapters for production
 export {

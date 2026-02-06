@@ -40,14 +40,31 @@ export interface KnowledgeBaseResult {
 }
 export declare function generateDocumentIndex(buffer: Buffer | ArrayBuffer, options: VectorlessIndexOptions): Promise<VectorlessIndexResult>;
 export declare function generateKnowledgeBase(buffer: Buffer | ArrayBuffer, filename: string, mimeType: string, options: KnowledgeBaseOptions): Promise<KnowledgeBaseResult>;
+import type { DocumentReport, DocumentReportEvent } from "./domain/document-report.schema.js";
+export interface DocumentReportOptions {
+    model: LanguageModel;
+    includeSemanticOverlay?: boolean;
+    generateTimeline?: boolean;
+    generateConceptMap?: boolean;
+    onEvent?: (event: DocumentReportEvent) => void;
+    onPatch?: (patch: string) => void;
+}
+export interface DocumentReportResult {
+    report: DocumentReport;
+    cached: boolean;
+}
+export declare function generateDocumentReport(buffer: Buffer | ArrayBuffer, filename: string, mimeType: string, options: DocumentReportOptions): Promise<DocumentReportResult>;
+export type { DocumentReport, DocumentReportEvent };
 export type { DocumentIndex, TreeNode, TocEntry, DocumentKnowledgeBase, KnowledgeNode, Entity, Relation, Quote, Keyword, Citation, Answer, Page, };
 export * from "./domain/schemas.js";
+export * from "./domain/document-report.schema.js";
 export * from "./ports/index.js";
 export * from "./agents/index.js";
 export * from "./infrastructure/index.js";
 export * from "./use-cases/index.js";
 export * from "./formatters/index.js";
 export * from "./search/index.js";
+export * from "./tools/index.js";
 export { PostgresKBRepository, createPostgresKBRepository, CREATE_KB_TABLE_SQL, PostgresPreferenceStore, createPostgresPreferenceStore, CREATE_PREFERENCE_TABLES_SQL, type PostgresClient, } from "./adapters/index.js";
 export type { DocumentKnowledgeBase as VectorlessKnowledgeBase, KnowledgeNode as VectorlessKnowledgeNode, TreeSearchResult, TreeSearchOptions, QueryClassification, UserPreference, DomainTemplate, SSEEvent, AggregatedResult, } from "vectorless";
 export { createTreeSearchOrchestrator, createMultiDocSearchAgent, createQueryClassifierAgent, createGreedySearchAgent, createMCTSSearchAgent, createContentExtractorAgent, createMultiNodeAggregatorAgent, createMemoryPreferenceStore, getDomainTemplate, listDomainTemplates, DOMAIN_TEMPLATES, LEGAL_TEMPLATE, MEDICAL_TEMPLATE, TECHNICAL_TEMPLATE, ACADEMIC_TEMPLATE, FINANCIAL_TEMPLATE, VERSION as VECTORLESS_VERSION, } from "vectorless";
