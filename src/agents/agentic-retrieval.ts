@@ -19,6 +19,7 @@ import {
   stepCountIs,
   Output,
   type LanguageModel,
+  type ToolSet,
 } from "ai";
 import { z } from "zod";
 import type { Page } from "../ports/index.js";
@@ -278,10 +279,14 @@ After gathering information, output ONLY the JSON object.`;
   });
 
   // Build the tools object based on whether pages are provided
-  const tools = hasPages
+  const baseTools = {
+    get_structure: getStructureTool,
+    read_section: readSectionTool,
+  };
+
+  const tools: ToolSet = hasPages
     ? {
-        get_structure: getStructureTool,
-        read_section: readSectionTool,
+        ...baseTools,
         read_pages: tool({
           description:
             "Read content from specific page numbers. " +
@@ -340,17 +345,14 @@ After gathering information, output ONLY the JSON object.`;
           },
         }),
       }
-    : {
-        get_structure: getStructureTool,
-        read_section: readSectionTool,
-      };
+    : baseTools;
 
   // Create the agent
   const agent = new ToolLoopAgent({
-    model: model as any,
+    model,
     instructions,
     output: Output.object({ schema: AgenticRetrievalOutputSchema }),
-    tools: tools as any, // Cast to any to avoid complex union type issues
+    tools,
     stopWhen: stepCountIs(maxSteps),
   });
 

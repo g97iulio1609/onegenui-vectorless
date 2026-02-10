@@ -223,7 +223,7 @@ export async function searchTree(
       : "";
 
     const stream = streamText({
-      model: model as any,
+      model,
       output: Output.object({ schema: SearchResultSchema }),
       prompt: `You are an expert document analyst performing reasoning-based retrieval.
 Given a query and a document's hierarchical structure, identify the most relevant sections.
@@ -338,7 +338,7 @@ async function performDrillDown(
       .join("\n");
 
     const { output: drillResult } = await generateText({
-      model: model as any,
+      model,
       output: Output.object({ schema: DrillDownSchema }),
       prompt: `Select the most relevant child sections for this query.
 

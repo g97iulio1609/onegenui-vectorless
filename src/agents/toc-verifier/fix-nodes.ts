@@ -44,7 +44,7 @@ export async function fixNodePageIndex(
 }`;
 
   const { output } = await generateText({
-    model: model as any,
+    model,
     output: Output.object({ schema: FixPageIndexSchema }),
     prompt: `Find which page contains the start of the given section.
 Pages are marked with <physical_index_X> tags.

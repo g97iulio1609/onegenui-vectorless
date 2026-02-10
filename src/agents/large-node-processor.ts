@@ -101,7 +101,7 @@ async function extractSubstructure(
 }`;
 
   const { output } = await generateText({
-    model: model as any,
+    model,
     output: Output.object({ schema: SubstructureSchema }),
     prompt: `Extract subsections from this document portion.
 The text contains <physical_index_X> tags marking page boundaries.

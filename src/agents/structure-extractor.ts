@@ -170,7 +170,7 @@ export function createStructureExtractorAgent(
 }`;
 
       const agent = new ToolLoopAgent({
-        model: model as any,
+        model,
         instructions: `You are an expert at analyzing document structure. Extract the hierarchical structure from this ${totalPages}-page document.
 ${tocContext}
 

@@ -67,7 +67,7 @@ export function createTocDetectorAgent(
 }`;
 
       const agent = new ToolLoopAgent({
-        model: model as any,
+        model,
         instructions: `You are an expert at detecting Table of Contents in documents.
 
 WORKFLOW:

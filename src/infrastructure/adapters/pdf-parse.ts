@@ -1,4 +1,3 @@
-// @ts-expect-error pdf-parse doesn't have types
 import pdf from "pdf-parse";
 import type { PdfParserPort, Page } from "../../ports/index.js";
 
@@ -92,7 +91,7 @@ export class PdfParseAdapter implements PdfParserPort {
         pdf(buffer, { max: 1 }),
         this.timeoutMs,
         `PDF page count timed out after ${this.timeoutMs}ms`,
-      ) as { numpages: number };
+      );
       return data.numpages;
     } catch (error) {
       if (error instanceof Error) {

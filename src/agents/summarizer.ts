@@ -56,7 +56,7 @@ export function createSummarizerAgent(model: LanguageModel): SummarizerPort {
 
       // Create summary agent
       const summaryAgent = new ToolLoopAgent({
-        model: model as any,
+        model,
         instructions: `You are an expert at summarizing document sections.
 Create concise, informative summaries that capture the key points.
 Keep summaries between 1-3 sentences.`,
@@ -140,7 +140,7 @@ Keep summaries between 1-3 sentences.`,
 
     async generateDocumentDescription(tree: TreeNode): Promise<string> {
       const descriptionAgent = new ToolLoopAgent({
-        model: model as any,
+        model,
         instructions: `You are an expert at describing documents.
 Based on the document structure, provide a comprehensive description that includes:
 - What type of document this is

@@ -31,7 +31,7 @@ export async function verifyTitleOnPage(
 }`;
 
   const { output } = await generateText({
-    model: model as any,
+    model,
     output: Output.object({ schema: VerifyTitleSchema }),
     prompt: `Check if the given section title appears in the page text.
 Do fuzzy matching, ignore space inconsistencies.
@@ -69,7 +69,7 @@ export async function verifyTitleAtPageStart(
 }`;
 
   const { output } = await generateText({
-    model: model as any,
+    model,
     output: Output.object({ schema: VerifyTitleStartSchema }),
     prompt: `Check if the section starts at the BEGINNING of the page.
 If there are other contents before the section title, answer "no".
