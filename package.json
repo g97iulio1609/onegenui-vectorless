@@ -33,6 +33,7 @@
   "dependencies": {
     "vectorless": "workspace:*",
     "ai": "^6.0.68",
+    "@onegenui/deep-agents": "workspace:*",
     "jszip": "^3.10.1",
     "mammoth": "^1.8.0",
     "marked": "^15.0.0",

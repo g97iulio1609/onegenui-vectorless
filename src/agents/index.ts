@@ -44,6 +44,10 @@ export { CitationResolverAgent } from "./citation-resolver.js";
 export { QuestionAnswerAgent } from "./question-answer.js";
 export { DeepDiveAgent } from "./deep-dive.js";
 
+// DeepAgent-based wrappers
+export { createDocumentAgent } from "./deep-agent-wrappers.js";
+export type { DocumentAgentConfig } from "./deep-agent-wrappers.js";
+
 // Agentic Retrieval (PageIndex pattern)
 export {
   agenticRetrieval,
