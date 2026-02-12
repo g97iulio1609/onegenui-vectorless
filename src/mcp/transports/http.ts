@@ -6,6 +6,7 @@ import { McpState } from '../state.js';
 
 /** Per-session transport storage */
 const sessions = new Map<string, StreamableHTTPServerTransport>();
+const MAX_SESSIONS = 100;
 
 async function handleMcpRequest(
   req: http.IncomingMessage,
@@ -17,6 +18,16 @@ async function handleMcpRequest(
   if (sessionId && sessions.has(sessionId)) {
     await sessions.get(sessionId)!.handleRequest(req, res);
     return;
+  }
+
+  // Evict oldest session if at capacity
+  if (sessions.size >= MAX_SESSIONS) {
+    const oldest = sessions.keys().next().value;
+    if (oldest) {
+      const old = sessions.get(oldest);
+      sessions.delete(oldest);
+      await old?.close().catch(() => {});
+    }
   }
 
   // New session: create fresh transport + server pair sharing state
