@@ -8,6 +8,8 @@ import type {
   NeighborOptions,
   GraphStats,
 } from '../ports/graph-store.port.js';
+import { detectCommunitiesLouvain } from './louvain.js';
+import { bfsNeighbors, findShortestPathBFS } from './traversal.js';
 
 /** In-memory adjacency list graph with Louvain community detection */
 export class InMemoryGraphAdapter implements GraphStorePort {
@@ -58,13 +60,12 @@ export class InMemoryGraphAdapter implements GraphStorePort {
   }
 
   getNeighbors(nodeId: string, options?: NeighborOptions): GraphNode[] {
-    const visited = new Set<string>();
-    const result: GraphNode[] = [];
     const maxDepth = options?.maxDepth ?? 1;
     const limit = options?.limit ?? 50;
-
-    this.bfsNeighbors(nodeId, maxDepth, options?.edgeTypes, visited, result);
-    return result.slice(0, limit);
+    return bfsNeighbors(
+      nodeId, maxDepth, options?.edgeTypes,
+      this.adjacency, this.edges, this.nodes,
+    ).slice(0, limit);
   }
 
   getEdgesOf(nodeId: string, options?: NeighborOptions): GraphEdge[] {
@@ -81,27 +82,7 @@ export class InMemoryGraphAdapter implements GraphStorePort {
   }
 
   findShortestPath(from: string, to: string): string[] {
-    if (from === to) return [from];
-    const parent = new Map<string, string>();
-    const queue = [from];
-    parent.set(from, '');
-
-    while (queue.length > 0) {
-      const current = queue.shift()!;
-      const edgeIds = this.adjacency.get(current);
-      if (!edgeIds) continue;
-
-      for (const eid of edgeIds) {
-        const edge = this.edges.get(eid);
-        if (!edge) continue;
-        const neighbor = edge.source === current ? edge.target : edge.source;
-        if (parent.has(neighbor)) continue;
-        parent.set(neighbor, current);
-        if (neighbor === to) return this.reconstructPath(parent, to);
-        queue.push(neighbor);
-      }
-    }
-    return [];
+    return findShortestPathBFS(from, to, this.adjacency, this.edges);
   }
 
   extractSubgraph(nodeIds: string[]): Subgraph {
@@ -147,55 +128,16 @@ export class InMemoryGraphAdapter implements GraphStorePort {
     this.nodeCommunity.clear();
   }
 
-  /** Louvain-inspired community detection */
   detectCommunities(): Community[] {
-    const nodeIds = [...this.nodes.keys()];
-    if (nodeIds.length === 0) return [];
-
-    const assignment = new Map<string, number>();
-    nodeIds.forEach((id, i) => assignment.set(id, i));
-
-    let changed = true;
-    let iterations = 0;
-    while (changed && iterations < 20) {
-      changed = false;
-      iterations++;
-      for (const nodeId of nodeIds) {
-        const best = this.findBestCommunity(nodeId, assignment);
-        if (best !== assignment.get(nodeId)) {
-          assignment.set(nodeId, best);
-          changed = true;
-        }
-      }
-    }
-
-    const communityMap = new Map<number, string[]>();
-    for (const [nodeId, cid] of assignment) {
-      if (!communityMap.has(cid)) communityMap.set(cid, []);
-      communityMap.get(cid)!.push(nodeId);
-    }
-
-    this.communities = [];
-    this.nodeCommunity.clear();
-    let idx = 0;
-    for (const [, members] of communityMap) {
-      const community: Community = {
-        id: `community-${idx++}`,
-        nodeIds: members,
-        weight: members.length,
-      };
-      this.communities.push(community);
-      for (const nid of members) {
-        this.nodeCommunity.set(nid, community.id);
-      }
-    }
+    const result = detectCommunitiesLouvain([...this.nodes.keys()], this.adjacency, this.edges);
+    this.communities = result.communities;
+    this.nodeCommunity = result.nodeCommunity;
     return this.communities;
   }
 
   getCommunity(nodeId: string): Community | undefined {
     const cid = this.nodeCommunity.get(nodeId);
-    if (!cid) return undefined;
-    return this.communities.find((c) => c.id === cid);
+    return cid ? this.communities.find((c) => c.id === cid) : undefined;
   }
 
   indexEntities(documentId: string, entities: Entity[]): void {
@@ -251,77 +193,5 @@ export class InMemoryGraphAdapter implements GraphStorePort {
       this.adjacency.set(nodeId, new Set());
     }
     return this.adjacency.get(nodeId)!;
-  }
-
-  private bfsNeighbors(
-    startId: string,
-    maxDepth: number,
-    edgeTypes: string[] | undefined,
-    visited: Set<string>,
-    result: GraphNode[],
-  ): void {
-    const queue: [string, number][] = [[startId, 0]];
-    visited.add(startId);
-
-    while (queue.length > 0) {
-      const [current, depth] = queue.shift()!;
-      if (depth >= maxDepth) continue;
-
-      const edgeIds = this.adjacency.get(current);
-      if (!edgeIds) continue;
-
-      for (const eid of edgeIds) {
-        const edge = this.edges.get(eid);
-        if (!edge) continue;
-        if (edgeTypes && !edgeTypes.includes(edge.type)) continue;
-        const neighbor = edge.source === current ? edge.target : edge.source;
-        if (visited.has(neighbor)) continue;
-        visited.add(neighbor);
-        const node = this.nodes.get(neighbor);
-        if (node) {
-          result.push(node);
-          queue.push([neighbor, depth + 1]);
-        }
-      }
-    }
-  }
-
-  private reconstructPath(parent: Map<string, string>, to: string): string[] {
-    const path: string[] = [];
-    let current = to;
-    while (current !== '') {
-      path.unshift(current);
-      current = parent.get(current) ?? '';
-    }
-    return path;
-  }
-
-  private findBestCommunity(
-    nodeId: string,
-    assignment: Map<string, number>,
-  ): number {
-    const currentCom = assignment.get(nodeId)!;
-    const edgeIds = this.adjacency.get(nodeId);
-    if (!edgeIds || edgeIds.size === 0) return currentCom;
-
-    const communityEdges = new Map<number, number>();
-    for (const eid of edgeIds) {
-      const edge = this.edges.get(eid);
-      if (!edge) continue;
-      const neighbor = edge.source === nodeId ? edge.target : edge.source;
-      const nCom = assignment.get(neighbor);
-      if (nCom === undefined) continue;
-      communityEdges.set(nCom, (communityEdges.get(nCom) ?? 0) + edge.weight);
-    }
-
-    let bestCom = currentCom;
-    let bestWeight = communityEdges.get(currentCom) ?? 0;
-    for (const [com, w] of communityEdges) {
-      if (w > bestWeight) {
-        bestWeight = w;
-        bestCom = com;
-      }
-    }
-    return bestCom;
   }
 }

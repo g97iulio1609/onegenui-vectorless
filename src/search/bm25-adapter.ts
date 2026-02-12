@@ -5,6 +5,10 @@ import type {
   SearchResult,
 } from '../ports/search.port.js';
 import { tokenize, type TokenizerOptions } from './tokenizer.js';
+import {
+  FIELD_BOOSTS, ALL_FIELDS, K1, B,
+  sumValues, buildHighlights,
+} from './bm25-scoring.js';
 
 interface TermPosting {
   tf: number;
@@ -17,18 +21,6 @@ interface DocEntry {
   fieldLengths: Record<string, number>;
   rawFields: Record<string, string>;
 }
-
-const FIELD_BOOSTS: Record<string, number> = {
-  title: 3.0,
-  keywords: 2.0,
-  summary: 1.5,
-  content: 1.0,
-};
-
-const ALL_FIELDS = Object.keys(FIELD_BOOSTS);
-const K1 = 1.2;
-const B = 0.75;
-const HIGHLIGHT_RADIUS = 30;
 
 export class BM25Adapter implements FullTextSearchPort {
   private index = new Map<string, Map<string, TermPosting>>();
@@ -191,32 +183,4 @@ export class BM25Adapter implements FullTextSearchPort {
       if (postings.size === 0) this.index.delete(term);
     }
   }
-}
-
-function sumValues(obj: Record<string, number>): number {
-  let sum = 0;
-  for (const v of Object.values(obj)) sum += v;
-  return sum;
-}
-
-function buildHighlights(
-  rawFields: Record<string, string>,
-  terms: Set<string>,
-): string[] {
-  const highlights: string[] = [];
-  const combined = Object.values(rawFields).join(' ');
-  const lower = combined.toLowerCase();
-
-  for (const term of terms) {
-    const idx = lower.indexOf(term);
-    if (idx === -1) continue;
-
-    const start = Math.max(0, idx - HIGHLIGHT_RADIUS);
-    const end = Math.min(combined.length, idx + term.length + HIGHLIGHT_RADIUS);
-    const prefix = start > 0 ? '...' : '';
-    const suffix = end < combined.length ? '...' : '';
-    highlights.push(`${prefix}${combined.slice(start, end)}${suffix}`);
-  }
-
-  return highlights;
 }
