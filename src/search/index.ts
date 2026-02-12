@@ -374,3 +374,7 @@ Select up to 3 most relevant child sections. Return only the JSON object.`,
 
 // Re-export helper for external use
 export { keywordSearch, buildNodeMap };
+
+// BM25 full-text search
+export { BM25Adapter } from './bm25-adapter.js';
+export { tokenize, type TokenizerOptions } from './tokenizer.js';

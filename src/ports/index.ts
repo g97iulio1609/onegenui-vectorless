@@ -14,6 +14,12 @@ import type {
   Citation,
 } from "../domain/schemas.js";
 
+export type {
+  FullTextSearchPort,
+  SearchResult as FullTextSearchResult,
+  SearchOptions as FullTextSearchOptions,
+} from "./search.port.js";
+
 export interface Page {
   pageNumber: number;
   content: string;
