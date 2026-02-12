@@ -37,6 +37,18 @@ export type {
   EntityLink,
 } from "./multi-doc.port.js";
 
+export type {
+  DetectivePort,
+  DetectiveOptions,
+  InvestigationResult,
+  InvestigationSource,
+  Hypothesis,
+  LayerLevel,
+  BudgetMode,
+} from "./detective.port.js";
+
+export { BUDGET_LIMITS, OP_COSTS } from "./detective.port.js";
+
 export interface Page {
   pageNumber: number;
   content: string;
