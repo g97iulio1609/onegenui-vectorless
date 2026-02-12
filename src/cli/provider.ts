@@ -38,24 +38,20 @@ export async function createModel(
 
   switch (provider) {
     case 'gemini': {
-      // @ts-expect-error — dynamic import, installed as peer dep
       const { createGoogleGenerativeAI } = await import('@ai-sdk/google');
-      return createGoogleGenerativeAI({ apiKey: key })(model);
+      return createGoogleGenerativeAI({ apiKey: key })(model) as unknown as LanguageModel;
     }
     case 'openai': {
-      // @ts-expect-error — dynamic import, installed as peer dep
       const { createOpenAI } = await import('@ai-sdk/openai');
-      return createOpenAI({ apiKey: key })(model);
+      return createOpenAI({ apiKey: key })(model) as unknown as LanguageModel;
     }
     case 'anthropic': {
-      // @ts-expect-error — dynamic import, installed as peer dep
       const { createAnthropic } = await import('@ai-sdk/anthropic');
-      return createAnthropic({ apiKey: key })(model);
+      return createAnthropic({ apiKey: key })(model) as unknown as LanguageModel;
     }
     case 'openrouter': {
-      // @ts-expect-error — dynamic import, installed as peer dep
       const { createOpenRouter } = await import('@openrouter/ai-sdk-provider');
-      return createOpenRouter({ apiKey: key })(model);
+      return createOpenRouter({ apiKey: key })(model) as unknown as LanguageModel;
     }
   }
 }
