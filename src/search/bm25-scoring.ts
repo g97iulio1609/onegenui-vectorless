@@ -24,13 +24,11 @@ export function buildHighlights(
 ): string[] {
   const highlights: string[] = [];
   const combined = Object.values(rawFields).join(' ');
-  const lower = combined.toLowerCase();
 
   for (const term of terms) {
-    // Build regex that matches words starting with the stemmed term
     const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const regex = new RegExp(escaped + '\\w*', 'gi');
-    const match = regex.exec(lower);
+    const match = regex.exec(combined);
     if (!match) continue;
 
     const idx = match.index;
