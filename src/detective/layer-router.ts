@@ -64,7 +64,7 @@ export async function classifyQueryLayerWithLLM(
   const { z } = await import('zod');
 
   const schema = z.object({
-    layer: z.number().min(1).max(4).describe('1=specific text, 2=cross-doc analysis, 3=pattern/trend, 4=executive overview'),
+    layer: z.number().int().min(1).max(4).describe('1=specific text, 2=cross-doc analysis, 3=pattern/trend, 4=executive overview'),
     reason: z.string().describe('Brief reason for classification'),
   });
 
@@ -82,7 +82,10 @@ Document count: ${docCount}
 Query: "${query}"`,
     });
 
-    if (output?.layer) return output.layer as LayerLevel;
+    if (output?.layer) {
+      const clamped = Math.min(4, Math.max(1, Math.round(output.layer))) as LayerLevel;
+      return clamped;
+    }
   } catch {
     // Fallback to pattern result
   }
