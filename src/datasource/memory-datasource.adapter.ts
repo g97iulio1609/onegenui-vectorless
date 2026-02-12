@@ -94,7 +94,13 @@ export class MemoryDataSourceAdapter implements DataSourcePort {
 
   private notifyWatchers(event: ChangeEvent): void {
     for (const watcher of this.watchers) {
-      watcher(event);
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        const result: unknown = watcher(event);
+        if (result && typeof (result as Promise<void>).catch === 'function') {
+          (result as Promise<void>).catch(() => { /* handled by watcher */ });
+        }
+      } catch { /* watcher errors are non-fatal */ }
     }
   }
 }

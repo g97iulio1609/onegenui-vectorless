@@ -71,10 +71,16 @@ export class BM25Adapter implements FullTextSearchPort {
       const postings = this.index.get(token);
       if (!postings) continue;
 
-      const df = postings.size;
+      // Count unique documents for IDF (composite keys contain docKey\0field)
+      const uniqueDocs = new Set<string>();
+      for (const fpKey of postings.keys()) {
+        uniqueDocs.add(fpKey.split('\0')[0]!);
+      }
+      const df = uniqueDocs.size;
       const idf = Math.log((N - df + 0.5) / (df + 0.5) + 1);
 
-      for (const [docKey, posting] of postings) {
+      for (const [fpKey, posting] of postings) {
+        const docKey = fpKey.split('\0')[0]!;
         if (!fields.includes(posting.field)) continue;
 
         const entry = this.docs.get(docKey);
@@ -125,8 +131,6 @@ export class BM25Adapter implements FullTextSearchPort {
     };
   }
 
-  // --- private helpers ---
-
   private walkNode(node: KnowledgeNode, documentId: string): void {
     this.indexNode(node, documentId);
     for (const child of node.children) {
@@ -136,6 +140,14 @@ export class BM25Adapter implements FullTextSearchPort {
 
   private indexNode(node: KnowledgeNode, documentId: string): void {
     const docKey = `${documentId}:${node.id}`;
+
+    // Subtract old stats if re-indexing same docKey
+    const existing = this.docs.get(docKey);
+    if (existing) {
+      this.totalFieldLengths -= sumValues(existing.fieldLengths);
+      this.removeFromIndex(docKey);
+    }
+
     const fieldTexts: Record<string, string> = {
       title: node.title,
       summary: node.summary ?? '',
@@ -151,12 +163,11 @@ export class BM25Adapter implements FullTextSearchPort {
       const tfMap = new Map<string, number>();
       for (const t of tokens) tfMap.set(t, (tfMap.get(t) ?? 0) + 1);
 
+      // Store per-field postings using composite key
       for (const [term, tf] of tfMap) {
         if (!this.index.has(term)) this.index.set(term, new Map());
-        const existing = this.index.get(term)!.get(docKey);
-        if (!existing || tf > existing.tf) {
-          this.index.get(term)!.set(docKey, { tf, field });
-        }
+        const fpKey = `${docKey}\0${field}`;
+        this.index.get(term)!.set(fpKey, { tf, field });
       }
     }
 
@@ -175,8 +186,11 @@ export class BM25Adapter implements FullTextSearchPort {
   }
 
   private removeFromIndex(docKey: string): void {
+    const prefix = docKey + '\0';
     for (const [, postings] of this.index) {
-      postings.delete(docKey);
+      for (const fpKey of postings.keys()) {
+        if (fpKey.startsWith(prefix)) postings.delete(fpKey);
+      }
     }
     // clean empty terms
     for (const [term, postings] of this.index) {

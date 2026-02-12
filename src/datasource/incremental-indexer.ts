@@ -71,16 +71,15 @@ export class IncrementalIndexer {
   private async handleChange(event: ChangeEvent, sourceId: string): Promise<void> {
     const { type, document } = event;
 
-    if (type === 'removed') {
-      this.multiDoc.removeKnowledgeBase(document.id);
-      this.emit({ type: 'removed', documentId: document.id, sourceId });
-      return;
-    }
-
-    // added or modified → re-index
     try {
+      if (type === 'removed') {
+        this.multiDoc.removeKnowledgeBase(document.id);
+        this.emit({ type: 'removed', documentId: document.id, sourceId });
+        return;
+      }
+
+      // added or modified → re-index
       const start = Date.now();
-      // Remove old version if exists
       if (type === 'modified') {
         this.multiDoc.removeKnowledgeBase(document.id);
       }

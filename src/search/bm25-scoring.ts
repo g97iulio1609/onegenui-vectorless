@@ -27,11 +27,16 @@ export function buildHighlights(
   const lower = combined.toLowerCase();
 
   for (const term of terms) {
-    const idx = lower.indexOf(term);
-    if (idx === -1) continue;
+    // Build regex that matches words starting with the stemmed term
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(escaped + '\\w*', 'gi');
+    const match = regex.exec(lower);
+    if (!match) continue;
 
+    const idx = match.index;
+    const matchLen = match[0].length;
     const start = Math.max(0, idx - HIGHLIGHT_RADIUS);
-    const end = Math.min(combined.length, idx + term.length + HIGHLIGHT_RADIUS);
+    const end = Math.min(combined.length, idx + matchLen + HIGHLIGHT_RADIUS);
     const prefix = start > 0 ? '...' : '';
     const suffix = end < combined.length ? '...' : '';
     highlights.push(`${prefix}${combined.slice(start, end)}${suffix}`);

@@ -21,6 +21,11 @@ export class MultiDocumentKB implements MultiDocumentKBPort {
   ) {}
 
   addKnowledgeBase(kb: DocumentKnowledgeBase): void {
+    // Guard: remove existing KB to prevent index corruption on re-add
+    if (this.kbs.has(kb.id)) {
+      this.removeKnowledgeBase(kb.id);
+    }
+
     this.kbs.set(kb.id, kb);
     this.filenames.set(kb.id, kb.filename);
 

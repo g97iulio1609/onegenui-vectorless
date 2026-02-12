@@ -7,7 +7,7 @@ import type { EntityLink } from '../ports/multi-doc.port.js';
  */
 export class EntityLinker {
   private canonicalMap = new Map<string, string>(); // normalized → canonicalId
-  private links: EntityLink[] = [];
+  private linksMap = new Map<string, EntityLink>(); // entityId → EntityLink (dedup)
   private counter = 0;
 
   /** Link entities from a document, return created links */
@@ -25,7 +25,7 @@ export class EntityLinker {
         documentId,
         canonicalId,
       };
-      this.links.push(link);
+      this.linksMap.set(entity.id, link);
       newLinks.push(link);
     }
     return newLinks;
@@ -33,21 +33,23 @@ export class EntityLinker {
 
   /** Get all links for an entity by its ID */
   getLinks(entityId: string): EntityLink[] {
-    const link = this.links.find((l) => l.entityId === entityId);
+    const link = this.linksMap.get(entityId);
     if (!link) return [];
-    return this.links.filter((l) => l.canonicalId === link.canonicalId);
+    return [...this.linksMap.values()].filter((l) => l.canonicalId === link.canonicalId);
   }
 
   /** Get all links for a canonical entity */
   getLinksByCanonical(canonicalId: string): EntityLink[] {
-    return this.links.filter((l) => l.canonicalId === canonicalId);
+    return [...this.linksMap.values()].filter((l) => l.canonicalId === canonicalId);
   }
 
   /** Remove all links for a document and clean up orphaned canonical entries */
   removeDocument(documentId: string): void {
-    this.links = this.links.filter((l) => l.documentId !== documentId);
+    for (const [entityId, link] of this.linksMap) {
+      if (link.documentId === documentId) this.linksMap.delete(entityId);
+    }
     // Clean orphaned canonical entries
-    const activeCanonicals = new Set(this.links.map((l) => l.canonicalId));
+    const activeCanonicals = new Set([...this.linksMap.values()].map((l) => l.canonicalId));
     for (const [key, cid] of this.canonicalMap) {
       if (!activeCanonicals.has(cid)) this.canonicalMap.delete(key);
     }
