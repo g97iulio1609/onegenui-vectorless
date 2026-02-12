@@ -5,6 +5,9 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "vectorless": "./dist/cli/index.js"
+  },
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -21,6 +24,10 @@
     "./adapters": {
       "import": "./dist/adapters/index.js",
       "types": "./dist/adapters/index.d.ts"
+    },
+    "./cli": {
+      "import": "./dist/cli/index.js",
+      "types": "./dist/cli/index.d.ts"
     }
   },
   "scripts": {
@@ -31,25 +38,41 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "vectorless": "workspace:*",
-    "ai": "^6.0.68",
     "@onegenui/deep-agents": "workspace:*",
+    "ai": "^6.0.68",
     "jszip": "^3.10.1",
     "mammoth": "^1.8.0",
     "marked": "^15.0.0",
     "officegen": "^0.6.5",
     "pdf-parse": "^1.1.1",
     "pptx2json": "^0.0.10",
+    "vectorless": "workspace:*",
     "xlsx": "^0.18.5",
     "zod": "^4.0.0"
   },
   "peerDependencies": {
     "@onegenui/mcp": "workspace:*",
     "@onegenui/providers": "workspace:*",
+    "@ai-sdk/google": "^1.0.0",
+    "@ai-sdk/openai": "^1.0.0",
+    "@ai-sdk/anthropic": "^1.0.0",
+    "@openrouter/ai-sdk-provider": "^0.0.5",
     "react": "^18.0.0 || ^19.0.0"
   },
   "peerDependenciesMeta": {
     "react": {
+      "optional": true
+    },
+    "@ai-sdk/google": {
+      "optional": true
+    },
+    "@ai-sdk/openai": {
+      "optional": true
+    },
+    "@ai-sdk/anthropic": {
+      "optional": true
+    },
+    "@openrouter/ai-sdk-provider": {
       "optional": true
     }
   },
@@ -57,6 +80,9 @@
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.0.0",
     "@types/react": "19.2.3",
+    "chalk": "^5.6.2",
+    "commander": "^14.0.3",
+    "ora": "^9.3.0",
     "typescript": "^5.9.2",
     "vitest": "^4.0.17"
   },
