@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import nodePath from 'node:path';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { McpState } from '../state.js';
 
@@ -51,8 +52,7 @@ function isPrivateUrl(url: string): boolean {
 
 /** Validate file path: must be absolute, no traversal */
 function validateFilePath(filePath: string): string | null {
-  const path = require('node:path');
-  const resolved = path.resolve(filePath);
+  const resolved = nodePath.resolve(filePath);
   if (resolved.includes('\0')) return 'Path contains null byte';
   if (filePath !== resolved && filePath.includes('..')) return 'Path traversal not allowed';
   return null;
@@ -71,7 +71,6 @@ export function registerDatasourceTools(server: McpServer, state: McpState): voi
         if (pathError) return errorResult(pathError);
 
         const fs = await import('node:fs/promises');
-        const nodePath = await import('node:path');
         const buffer = await fs.readFile(args.path);
         const filename = nodePath.basename(args.path);
         const mimeType = getMimeType(args.path);
@@ -103,7 +102,14 @@ export function registerDatasourceTools(server: McpServer, state: McpState): voi
       try {
         if (isPrivateUrl(args.url)) return errorResult('Private/internal URLs are not allowed.');
 
-        const response = await fetch(args.url);
+        const response = await fetch(args.url, { redirect: 'manual' });
+        if (response.status >= 300 && response.status < 400) {
+          const location = response.headers.get('location');
+          if (location && isPrivateUrl(new URL(location, args.url).href)) {
+            return errorResult('Redirect to private/internal URL is not allowed.');
+          }
+          return errorResult(`Redirect to ${location ?? 'unknown'} — follow manually.`);
+        }
         if (!response.ok) return errorResult(`HTTP ${response.status}: ${response.statusText}`);
 
         const contentType = response.headers.get('content-type') ?? '';
@@ -113,7 +119,7 @@ export function registerDatasourceTools(server: McpServer, state: McpState): voi
         if (!textContent.trim()) return errorResult('No text content extracted from URL.');
 
         const encoded = new TextEncoder().encode(textContent);
-        const ab = encoded.buffer.slice(encoded.byteOffset, encoded.byteOffset + encoded.byteLength);
+        const ab = bufferToArrayBuffer(Buffer.from(encoded.buffer, encoded.byteOffset, encoded.byteLength));
         const { generateKnowledgeBase } = await import('../../index.js');
         const parsed = new URL(args.url);
         const filename = parsed.hostname + parsed.pathname.replace(/\//g, '_');
