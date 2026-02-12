@@ -3,6 +3,7 @@ import nodePath from 'node:path';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { McpState } from '../state.js';
 import { isPrivateUrl } from './url-guard.js';
+import { textResult, errorResult } from './result.js';
 
 const MIME_MAP: Record<string, string> = {
   '.pdf': 'application/pdf',
@@ -16,15 +17,6 @@ const MIME_MAP: Record<string, string> = {
   '.html': 'text/html',
   '.csv': 'text/csv',
 };
-
-function textResult(data: unknown) {
-  return { content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }] };
-}
-
-function errorResult(error: unknown) {
-  const msg = error instanceof Error ? error.message : String(error);
-  return { content: [{ type: 'text' as const, text: msg }], isError: true as const };
-}
 
 function getMimeType(filePath: string): string {
   const ext = filePath.slice(filePath.lastIndexOf('.')).toLowerCase();
