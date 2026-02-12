@@ -2,6 +2,7 @@ import { z } from 'zod';
 import nodePath from 'node:path';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { McpState } from '../state.js';
+import { isPrivateUrl } from './url-guard.js';
 
 const MIME_MAP: Record<string, string> = {
   '.pdf': 'application/pdf',
@@ -36,19 +37,6 @@ function bufferToArrayBuffer(buf: Buffer): ArrayBuffer {
   const view = new Uint8Array(ab);
   view.set(new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength));
   return ab;
-}
-
-/** Block private/reserved IP ranges for SSRF protection */
-function isPrivateUrl(url: string): boolean {
-  const parsed = new URL(url);
-  const host = parsed.hostname.replace(/^\[|\]$/g, '');
-  const privatePatterns = [
-    /^127\./, /^10\./, /^172\.(1[6-9]|2\d|3[01])\./, /^192\.168\./,
-    /^169\.254\./, /^0\./, /^::1$/, /^fc00:/i, /^fd/i, /^fe80:/i,
-    /^::ffff:/i, // IPv4-mapped IPv6
-    /^localhost$/i,
-  ];
-  return privatePatterns.some((p) => p.test(host));
 }
 
 /** Validate file path: must be absolute, no traversal */
@@ -113,8 +101,13 @@ export function registerDatasourceTools(server: McpServer, state: McpState): voi
         }
         if (!response.ok) return errorResult(`HTTP ${response.status}: ${response.statusText}`);
 
+        const MAX_BODY = 50 * 1024 * 1024; // 50 MB
+        const cl = parseInt(response.headers.get('content-length') ?? '0', 10);
+        if (cl > MAX_BODY) return errorResult(`Response too large: ${cl} bytes (max 50MB).`);
+
         const contentType = response.headers.get('content-type') ?? '';
         const rawContent = await response.text();
+        if (rawContent.length > MAX_BODY) return errorResult('Response exceeds 50MB limit.');
         const isHtml = contentType.includes('text/html') || rawContent.trimStart().startsWith('<');
         const textContent = isHtml ? stripHtml(rawContent) : rawContent;
         if (!textContent.trim()) return errorResult('No text content extracted from URL.');
