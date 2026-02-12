@@ -20,6 +20,16 @@ export type {
   SearchOptions as FullTextSearchOptions,
 } from "./search.port.js";
 
+export type {
+  GraphStorePort,
+  GraphNode,
+  GraphEdge,
+  Community,
+  Subgraph,
+  NeighborOptions,
+  GraphStats,
+} from "./graph-store.port.js";
+
 export interface Page {
   pageNumber: number;
   content: string;
