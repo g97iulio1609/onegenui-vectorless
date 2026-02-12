@@ -1,56 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { tokenize } from '../search/tokenizer.js';
 import { BM25Adapter } from '../search/bm25-adapter.js';
-import type { DocumentKnowledgeBase, KnowledgeNode } from '../domain/schemas.js';
-
-// ─── Helper: minimal KnowledgeNode ────────────────────────────────────────────
-
-function makeNode(overrides: Partial<KnowledgeNode> & { id: string; title: string }): KnowledgeNode {
-  return {
-    level: 0,
-    pageStart: 1,
-    pageEnd: 1,
-    summary: '',
-    keyPoints: [],
-    entities: [],
-    keywords: [],
-    quotes: [],
-    internalRefs: [],
-    externalRefs: [],
-    children: [],
-    ...overrides,
-  };
-}
-
-function makeKB(overrides: Partial<DocumentKnowledgeBase> & { id: string; tree: KnowledgeNode }): DocumentKnowledgeBase {
-  return {
-    filename: 'test.pdf',
-    mimeType: 'application/pdf',
-    hash: 'abc123',
-    processedAt: new Date().toISOString(),
-    totalPages: 10,
-    totalTokens: 1000,
-    entities: [],
-    relations: [],
-    keywords: [],
-    quotes: [],
-    citations: [],
-    metrics: {
-      totalWords: 500,
-      totalCharacters: 3000,
-      averageWordsPerPage: 50,
-      readingTimeMinutes: 2,
-      complexityScore: 30,
-      vocabularyRichness: 0.5,
-      sentenceCount: 40,
-      averageSentenceLength: 12,
-      paragraphCount: 10,
-    },
-    description: 'Test knowledge base',
-    keyInsights: [],
-    ...overrides,
-  };
-}
+import { makeKnowledgeNode as makeNode, makeKB } from './test-helpers.js';
 
 // ─── Tokenizer tests ─────────────────────────────────────────────────────────
 

@@ -3,79 +3,8 @@ import { MultiDocumentKB } from '../multi-doc/multi-document-kb.js';
 import { EntityLinker } from '../multi-doc/entity-linker.js';
 import { BM25Adapter } from '../search/bm25-adapter.js';
 import { InMemoryGraphAdapter } from '../graph/in-memory-graph.adapter.js';
-import type { DocumentKnowledgeBase, Entity, Relation, KnowledgeNode } from '../domain/schemas.js';
-
-function makeKnowledgeNode(id: string, title: string, keywords: string[] = [], summary = ''): KnowledgeNode {
-  return {
-    id,
-    title,
-    level: 1,
-    pageStart: 1,
-    pageEnd: 2,
-    summary: summary || `Summary of ${title}`,
-    keyPoints: [],
-    entities: [],
-    keywords,
-    quotes: [],
-    internalRefs: [],
-    externalRefs: [],
-    children: [],
-  };
-}
-
-function makeKB(id: string, filename: string, opts?: {
-  entities?: Entity[];
-  relations?: Relation[];
-  nodes?: KnowledgeNode[];
-}): DocumentKnowledgeBase {
-  const nodes = opts?.nodes ?? [
-    makeKnowledgeNode(`${id}-sec1`, `${filename} Section 1`, ['contract', 'penalty']),
-    makeKnowledgeNode(`${id}-sec2`, `${filename} Section 2`, ['delivery', 'timeline']),
-  ];
-  return {
-    id,
-    filename,
-    mimeType: 'application/pdf',
-    hash: `hash-${id}`,
-    processedAt: new Date().toISOString(),
-    totalPages: 10,
-    totalTokens: 5000,
-    tree: {
-      id: `${id}-root`,
-      title: filename,
-      level: 0,
-      pageStart: 1,
-      pageEnd: 10,
-      summary: `Root of ${filename}`,
-      keyPoints: [],
-      entities: [],
-      keywords: [],
-      quotes: [],
-      internalRefs: [],
-      externalRefs: [],
-      children: nodes,
-    },
-    entities: opts?.entities ?? [],
-    relations: opts?.relations ?? [],
-    keywords: [],
-    quotes: [],
-    citations: [],
-    metrics: {
-      totalWords: 5000,
-      totalCharacters: 30000,
-      averageWordsPerPage: 500,
-      readingTimeMinutes: 20,
-      complexityScore: 50,
-      vocabularyRichness: 0.6,
-      sentenceCount: 200,
-      averageSentenceLength: 15,
-      paragraphCount: 40,
-    },
-    description: `Description of ${filename}`,
-    keyInsights: [],
-    processingMetadata: { version: '2.0.0' },
-  };
-}
+import { makeKnowledgeNodeSimple as makeKnowledgeNode, makeKBFromOpts as makeKB } from './test-helpers.js';
+import type { Entity, Relation } from '../domain/schemas.js';
 
 describe('EntityLinker', () => {
   let linker: EntityLinker;

@@ -2,36 +2,8 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { HybridSearchAdapter } from '../search/hybrid-search.adapter.js';
 import { BM25Adapter } from '../search/bm25-adapter.js';
 import { InMemoryGraphAdapter } from '../graph/in-memory-graph.adapter.js';
-import type { DocumentKnowledgeBase, KnowledgeNode, Entity, Relation } from '../domain/schemas.js';
-
-function makeNode(id: string, title: string, keywords: string[] = [], summary = ''): KnowledgeNode {
-  return {
-    id, title, level: 1, pageStart: 1, pageEnd: 2,
-    summary: summary || `Summary of ${title}`,
-    keyPoints: [], entities: [], keywords, quotes: [],
-    internalRefs: [], externalRefs: [], children: [],
-  };
-}
-
-function makeKB(id: string, filename: string, nodes: KnowledgeNode[], entities: Entity[] = [], relations: Relation[] = []): DocumentKnowledgeBase {
-  return {
-    id, filename, mimeType: 'application/pdf', hash: `hash-${id}`,
-    processedAt: new Date().toISOString(), totalPages: 10, totalTokens: 5000,
-    tree: {
-      id: `${id}-root`, title: filename, level: 0, pageStart: 1, pageEnd: 10,
-      summary: `Root of ${filename}`, keyPoints: [], entities: [], keywords: [],
-      quotes: [], internalRefs: [], externalRefs: [], children: nodes,
-    },
-    entities, relations, keywords: [], quotes: [], citations: [],
-    metrics: {
-      totalWords: 5000, totalCharacters: 30000, averageWordsPerPage: 500,
-      readingTimeMinutes: 20, complexityScore: 50, vocabularyRichness: 0.6,
-      sentenceCount: 200, averageSentenceLength: 15, paragraphCount: 40,
-    },
-    description: `Description of ${filename}`, keyInsights: [],
-    processingMetadata: { version: '2.0.0' },
-  };
-}
+import { makeKnowledgeNodeSimple as makeNode, makeKBFromNodes as makeKB } from './test-helpers.js';
+import type { Entity, KnowledgeNode } from '../domain/schemas.js';
 
 describe('HybridSearchAdapter', () => {
   let bm25: BM25Adapter;

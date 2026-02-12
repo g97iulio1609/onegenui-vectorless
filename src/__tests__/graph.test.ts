@@ -1,15 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { InMemoryGraphAdapter } from '../graph/in-memory-graph.adapter.js';
-import type { GraphNode, GraphEdge } from '../ports/graph-store.port.js';
+import { makeGraphNode as makeNode, makeGraphEdge as makeEdge } from './test-helpers.js';
 import type { Entity, Relation } from '../domain/schemas.js';
-
-function makeNode(id: string, label: string, type: GraphNode['type'] = 'entity'): GraphNode {
-  return { id, type, label, properties: {} };
-}
-
-function makeEdge(id: string, source: string, target: string, type = 'references', weight = 0.8): GraphEdge {
-  return { id, source, target, type, weight, properties: {} };
-}
 
 describe('InMemoryGraphAdapter', () => {
   let graph: InMemoryGraphAdapter;
