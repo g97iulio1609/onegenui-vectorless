@@ -139,7 +139,7 @@ export class BM25Adapter implements FullTextSearchPort {
     const fieldTexts: Record<string, string> = {
       title: node.title,
       summary: node.summary ?? '',
-      content: node.rawText ?? node.content ?? '',
+      content: node.rawText ?? '',
       keywords: (node.keywords ?? []).join(' '),
     };
 

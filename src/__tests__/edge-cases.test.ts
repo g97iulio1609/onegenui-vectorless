@@ -187,8 +187,7 @@ describe('MultiDoc Edge Cases', () => {
   it('should handle empty KB set', () => {
     const bm25 = new BM25Adapter();
     const graph = new InMemoryGraphAdapter();
-    const linker = new EntityLinker();
-    const multiDoc = new MultiDocumentKB(bm25, graph, linker);
+    const multiDoc = new MultiDocumentKB(bm25, graph);
     expect(multiDoc.getDocumentCount()).toBe(0);
     expect(multiDoc.search('anything')).toEqual([]);
   });

@@ -65,7 +65,7 @@ describe('InMemoryGraphAdapter', () => {
       graph.addEdge(makeEdge('e2', 'n1', 'n3', 'contradicts'));
       const edges = graph.getEdgesOf('n1', { edgeTypes: ['supports'] });
       expect(edges).toHaveLength(1);
-      expect(edges[0].type).toBe('supports');
+      expect(edges[0]!.type).toBe('supports');
     });
   });
 
@@ -79,7 +79,7 @@ describe('InMemoryGraphAdapter', () => {
 
       const neighbors = graph.getNeighbors('n1');
       expect(neighbors).toHaveLength(1);
-      expect(neighbors[0].id).toBe('n2');
+      expect(neighbors[0]!.id).toBe('n2');
     });
 
     it('should find 2-hop neighbors', () => {
@@ -112,7 +112,7 @@ describe('InMemoryGraphAdapter', () => {
 
       const neighbors = graph.getNeighbors('n1', { edgeTypes: ['supports'] });
       expect(neighbors).toHaveLength(1);
-      expect(neighbors[0].id).toBe('n2');
+      expect(neighbors[0]!.id).toBe('n2');
     });
   });
 
@@ -154,7 +154,7 @@ describe('InMemoryGraphAdapter', () => {
       const sub = graph.extractSubgraph(['n1', 'n2']);
       expect(sub.nodes).toHaveLength(2);
       expect(sub.edges).toHaveLength(1);
-      expect(sub.edges[0].id).toBe('e1');
+      expect(sub.edges[0]!.id).toBe('e1');
     });
   });
 

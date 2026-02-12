@@ -60,7 +60,7 @@ describe('EntityLinker', () => {
       occurrences: [{ nodeId: 's1', pageNumber: 1 }],
     }];
     linker.linkEntities('doc1', e);
-    linker.linkEntities('doc2', [{ ...e[0], id: 'ent2' }]);
+    linker.linkEntities('doc2', [{ ...e[0]!, id: 'ent2' }]);
     linker.removeDocument('doc1');
     expect(linker.getLinks('ent1')).toHaveLength(0);
   });
@@ -106,8 +106,8 @@ describe('MultiDocumentKB', () => {
 
     const results = multiDoc.search('penalty clause');
     expect(results.length).toBeGreaterThan(0);
-    expect(results[0].documentId).toBe('doc1');
-    expect(results[0].filename).toBe('Contract.pdf');
+    expect(results[0]!.documentId).toBe('doc1');
+    expect(results[0]!.filename).toBe('Contract.pdf');
   });
 
   it('should filter search by document IDs', () => {

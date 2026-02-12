@@ -3,7 +3,7 @@ import { HybridSearchAdapter } from '../search/hybrid-search.adapter.js';
 import { BM25Adapter } from '../search/bm25-adapter.js';
 import { InMemoryGraphAdapter } from '../graph/in-memory-graph.adapter.js';
 import { makeKnowledgeNodeSimple as makeNode, makeKBFromNodes as makeKB } from './test-helpers.js';
-import type { Entity, KnowledgeNode } from '../domain/schemas.js';
+import type { Entity, KnowledgeNode, Relation } from '../domain/schemas.js';
 
 describe('HybridSearchAdapter', () => {
   let bm25: BM25Adapter;
@@ -25,8 +25,8 @@ describe('HybridSearchAdapter', () => {
 
     const results = await hybrid.search('penalty clause', { channels: ['bm25'] });
     expect(results.length).toBeGreaterThan(0);
-    expect(results[0].nodeId).toContain('s1');
-    expect(results[0].channels[0].channel).toBe('bm25');
+    expect(results[0]!.nodeId).toContain('s1');
+    expect(results[0]!.channels[0]!.channel).toBe('bm25');
   });
 
   it('should return graph results', async () => {
@@ -45,7 +45,7 @@ describe('HybridSearchAdapter', () => {
 
     const results = await hybrid.search('ACME', { channels: ['graph'] });
     expect(results.length).toBeGreaterThan(0);
-    expect(results[0].channels[0].channel).toBe('graph');
+    expect(results[0]!.channels[0]!.channel).toBe('graph');
   });
 
   it('should fuse BM25 + Graph results with RRF', async () => {
@@ -64,7 +64,7 @@ describe('HybridSearchAdapter', () => {
     const results = await hybrid.search('ACME contract');
     expect(results.length).toBeGreaterThan(0);
     // Results that appear in multiple channels should have higher fused scores
-    const topResult = results[0];
+    const topResult = results[0]!;
     expect(topResult.fusedScore).toBeGreaterThan(0);
   });
 
@@ -120,6 +120,6 @@ describe('HybridSearchAdapter', () => {
     const results = await hybrid.search('penalty');
     expect(results.length).toBeGreaterThan(0);
     // The top result should appear in at least one channel
-    expect(results[0].channels.length).toBeGreaterThan(0);
+    expect(results[0]!.channels.length).toBeGreaterThan(0);
   });
 });

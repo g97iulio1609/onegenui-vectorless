@@ -77,7 +77,7 @@ describe('BM25Adapter', () => {
     id: 'root',
     title: 'Machine Learning Fundamentals',
     summary: 'An introduction to machine learning algorithms and neural networks',
-    content: 'Machine learning is a subset of artificial intelligence that enables systems to learn from data.',
+    rawText: 'Machine learning is a subset of artificial intelligence that enables systems to learn from data.',
     keywords: ['machine learning', 'neural networks', 'algorithms'],
     children: [
       makeNode({
@@ -87,7 +87,7 @@ describe('BM25Adapter', () => {
         pageStart: 2,
         pageEnd: 5,
         summary: 'Supervised learning uses labeled training data to learn a mapping function',
-        content: 'In supervised learning, the algorithm learns from labeled examples. Common approaches include regression and classification.',
+        rawText: 'In supervised learning, the algorithm learns from labeled examples. Common approaches include regression and classification.',
         keywords: ['supervised', 'classification', 'regression'],
         children: [
           makeNode({
@@ -97,7 +97,7 @@ describe('BM25Adapter', () => {
             pageStart: 3,
             pageEnd: 4,
             summary: 'Linear regression predicts continuous values using a linear model',
-            content: 'Linear regression fits a straight line to the data points minimizing the sum of squared errors.',
+            rawText: 'Linear regression fits a straight line to the data points minimizing the sum of squared errors.',
             keywords: ['regression', 'linear', 'prediction'],
           }),
         ],
@@ -109,7 +109,7 @@ describe('BM25Adapter', () => {
         pageStart: 6,
         pageEnd: 10,
         summary: 'Unsupervised learning discovers hidden patterns in unlabeled data',
-        content: 'Clustering and dimensionality reduction are key unsupervised techniques. K-means is a popular clustering algorithm.',
+        rawText: 'Clustering and dimensionality reduction are key unsupervised techniques. K-means is a popular clustering algorithm.',
         keywords: ['unsupervised', 'clustering', 'dimensionality'],
       }),
     ],
@@ -257,7 +257,7 @@ describe('BM25Adapter', () => {
           id: 'cook-root',
           title: 'Italian Cooking',
           summary: 'Traditional Italian pasta and pizza recipes',
-          content: 'Italian cuisine features pasta, pizza, risotto, and many other dishes.',
+          rawText: 'Italian cuisine features pasta, pizza, risotto, and many other dishes.',
           keywords: ['pasta', 'pizza', 'Italian cuisine'],
         }),
       });

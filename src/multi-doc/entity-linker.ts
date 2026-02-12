@@ -43,9 +43,14 @@ export class EntityLinker {
     return this.links.filter((l) => l.canonicalId === canonicalId);
   }
 
-  /** Remove all links for a document */
+  /** Remove all links for a document and clean up orphaned canonical entries */
   removeDocument(documentId: string): void {
     this.links = this.links.filter((l) => l.documentId !== documentId);
+    // Clean orphaned canonical entries
+    const activeCanonicals = new Set(this.links.map((l) => l.canonicalId));
+    for (const [key, cid] of this.canonicalMap) {
+      if (!activeCanonicals.has(cid)) this.canonicalMap.delete(key);
+    }
   }
 
   private normalize(value: string): string {

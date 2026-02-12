@@ -53,7 +53,7 @@ describe('MemoryDataSourceAdapter', () => {
     const page2 = await source.listDocuments({ limit: 3, offset: 3 });
     expect(page1).toHaveLength(3);
     expect(page2).toHaveLength(3);
-    expect(page1[0].id).not.toBe(page2[0].id);
+    expect(page1[0]!.id).not.toBe(page2[0]!.id);
   });
 
   it('should filter by updatedAfter', async () => {
@@ -67,7 +67,7 @@ describe('MemoryDataSourceAdapter', () => {
 
     const docs = await source.listDocuments({ updatedAfter: '2024-01-01T00:00:00Z' });
     expect(docs).toHaveLength(1);
-    expect(docs[0].id).toBe('d2');
+    expect(docs[0]!.id).toBe('d2');
   });
 
   it('should notify watchers on add', async () => {

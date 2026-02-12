@@ -140,7 +140,7 @@ export class HybridSearchAdapter implements HybridSearchPort {
 
     for (const results of channelResults) {
       for (let rank = 0; rank < results.length; rank++) {
-        const r = results[rank];
+        const r = results[rank]!;
         const key = `${r.documentId}:${r.nodeId}`;
         const rrfScore = 1 / (k + rank + 1);
 
