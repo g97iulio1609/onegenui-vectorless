@@ -378,3 +378,6 @@ export { keywordSearch, buildNodeMap };
 // BM25 full-text search
 export { BM25Adapter } from './bm25-adapter.js';
 export { tokenize, type TokenizerOptions } from './tokenizer.js';
+
+// Hybrid search with RRF fusion
+export { HybridSearchAdapter } from './hybrid-search.adapter.js';

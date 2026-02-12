@@ -49,6 +49,13 @@ export type {
 
 export { BUDGET_LIMITS, OP_COSTS } from "./detective.port.js";
 
+export type {
+  HybridSearchPort,
+  HybridResult,
+  HybridSearchOptions,
+  ScoredResult,
+} from "./hybrid-search.port.js";
+
 export interface Page {
   pageNumber: number;
   content: string;
