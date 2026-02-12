@@ -20,10 +20,12 @@ export async function executeLayer1(query: string, deps: LayerDeps): Promise<Lay
     if (!kb) continue;
     const node = findNodeInTree(kb.tree as unknown as Record<string, unknown>, result.nodeId);
     if (node) {
+      const rawText = 'rawText' in node ? String(node.rawText) : '';
+      const summary = 'summary' in node ? String(node.summary) : '';
       sources.push({
         documentId: result.documentId,
         nodeId: result.nodeId,
-        excerpt: (String(node.rawText ?? node.summary ?? '')).slice(0, 500),
+        excerpt: (rawText || summary).slice(0, 500),
         relevance: result.score,
       });
     }
@@ -60,9 +62,11 @@ export async function executeLayer2(query: string, deps: LayerDeps): Promise<Lay
     for (const [, kb] of iterKBs(multiDoc)) {
       const node = findNodeInTree(kb.tree, nodeId);
       if (node) {
+        const rawText = 'rawText' in node ? String(node.rawText) : '';
+        const summary = 'summary' in node ? String(node.summary) : '';
         sources.push({
           documentId: kb.id, nodeId,
-          excerpt: (String(node.rawText ?? node.summary ?? '')).slice(0, 500),
+          excerpt: (rawText || summary).slice(0, 500),
           relevance: 0.8,
         });
         break;

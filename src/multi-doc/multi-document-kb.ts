@@ -48,6 +48,11 @@ export class MultiDocumentKB implements MultiDocumentKBPort {
   }
 
   removeKnowledgeBase(documentId: string): void {
+    // Remove entity/relation nodes from graph before removing KB
+    const kb = this.kbs.get(documentId);
+    if (kb) {
+      for (const entity of kb.entities) this.graph.removeNode(entity.id);
+    }
     this.searchIndex.removeDocument(documentId);
     this.graph.removeNode(`doc:${documentId}`);
     this.entityLinker.removeDocument(documentId);

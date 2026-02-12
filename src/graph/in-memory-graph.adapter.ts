@@ -111,12 +111,12 @@ export class InMemoryGraphAdapter implements GraphStorePort {
   getStats(): GraphStats {
     const n = this.nodes.size;
     const e = this.edges.size;
-    const maxEdges = n > 1 ? (n * (n - 1)) / 2 : 1;
+    const maxEdges = n > 1 ? (n * (n - 1)) / 2 : 0;
     return {
       nodeCount: n,
       edgeCount: e,
       communityCount: this.communities.length,
-      density: e / maxEdges,
+      density: maxEdges > 0 ? e / maxEdges : 0,
     };
   }
 

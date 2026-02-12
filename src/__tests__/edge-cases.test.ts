@@ -142,6 +142,15 @@ describe('Graph Edge Cases', () => {
     const stats = graph.getStats();
     expect(stats.density).toBe(1.0);
   });
+
+  it('should return zero density for empty graph', () => {
+    expect(graph.getStats().density).toBe(0);
+  });
+
+  it('should return zero density for single node', () => {
+    graph.addNode(makeGraphNode('a', 'A'));
+    expect(graph.getStats().density).toBe(0);
+  });
 });
 
 // ─── Hybrid Search Edge Cases ─────────────────────────────────────────────────
