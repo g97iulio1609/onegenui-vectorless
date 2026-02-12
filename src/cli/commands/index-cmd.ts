@@ -3,7 +3,6 @@ import ora from 'ora';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { state } from '../state.js';
-import { generateKnowledgeBase } from '../../index.js';
 
 const MIME_MAP: Record<string, string> = {
   '.pdf': 'application/pdf',
@@ -37,6 +36,7 @@ export async function indexCommand(filePaths: string[]): Promise<void> {
 
     try {
       const buffer = await fs.readFile(resolved);
+      const { generateKnowledgeBase } = await import('../../index.js');
       const { knowledgeBase } = await generateKnowledgeBase(
         buffer.buffer as ArrayBuffer,
         filename,
