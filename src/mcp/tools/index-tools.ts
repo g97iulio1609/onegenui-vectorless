@@ -18,7 +18,9 @@ async function fetchSafe(url: string): Promise<ArrayBuffer> {
   const MAX_BODY = 100 * 1024 * 1024; // 100 MB for documents
   const cl = parseInt(res.headers.get('content-length') ?? '0', 10);
   if (cl > MAX_BODY) throw new Error(`Response too large: ${cl} bytes (max 100MB).`);
-  return res.arrayBuffer();
+  const ab = await res.arrayBuffer();
+  if (ab.byteLength > MAX_BODY) throw new Error(`Response body too large: ${ab.byteLength} bytes (max 100MB).`);
+  return ab;
 }
 
 function base64ToArrayBuffer(b64: string): ArrayBuffer {
