@@ -56,6 +56,15 @@ export type {
   ScoredResult,
 } from "./hybrid-search.port.js";
 
+export type {
+  DataSourcePort,
+  SourceDocument,
+  ListFilter,
+  SchemaField,
+  ChangeEvent,
+  Unsubscribe,
+} from "./datasource.port.js";
+
 export interface Page {
   pageNumber: number;
   content: string;
