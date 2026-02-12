@@ -49,13 +49,18 @@ export async function executeLayer2(query: string, deps: LayerDeps): Promise<Lay
   const results = search.search(query, { limit: 10 });
 
   budget.spend(2); // graph_query
-  const topNodeIds = results.slice(0, 3).map((r) => r.nodeId);
+  // Map BM25 results to entity IDs via KB, then expand graph from entities
   const relatedNodes = new Set<string>();
-  for (const nid of topNodeIds) {
-    for (const n of graph.getNeighbors(nid, { maxDepth: 1 })) relatedNodes.add(n.id);
+  for (const r of results.slice(0, 3)) {
+    const kb = multiDoc.getKnowledgeBase(r.documentId);
+    if (!kb) continue;
+    for (const entity of kb.entities) {
+      for (const n of graph.getNeighbors(entity.id, { maxDepth: 1 })) relatedNodes.add(n.id);
+    }
   }
 
-  const readTargets = [...new Set([...topNodeIds, ...relatedNodes])].slice(0, 5);
+  const topNodeIds = results.slice(0, 3).map((r) => r.nodeId);
+  const readTargets = [...new Set([...topNodeIds])].slice(0, 5);
   for (const nodeId of readTargets) {
     if (!budget.canAfford(3)) break;
     budget.spend(3);
@@ -85,16 +90,21 @@ export async function executeLayer2(query: string, deps: LayerDeps): Promise<Lay
 
 // ─── Layer 3: Strategist ─────────────────────────────────
 export async function executeLayer3(query: string, deps: LayerDeps): Promise<LayerResult> {
-  const { search, graph, budget, model } = deps;
+  const { search, graph, multiDoc, budget, model } = deps;
 
   const communities = graph.detectCommunities();
   budget.spend(1);
   const results = search.search(query, { limit: 20 });
 
+  // Map BM25 results to entity IDs, then find communities
   const communityHits = new Map<string, number>();
   for (const r of results) {
-    const c = graph.getCommunity(r.nodeId);
-    if (c) communityHits.set(c.id, (communityHits.get(c.id) ?? 0) + 1);
+    const kb = multiDoc.getKnowledgeBase(r.documentId);
+    if (!kb) continue;
+    for (const entity of kb.entities) {
+      const c = graph.getCommunity(entity.id);
+      if (c) communityHits.set(c.id, (communityHits.get(c.id) ?? 0) + 1);
+    }
   }
 
   const topCommunities = [...communityHits.entries()]
