@@ -30,6 +30,13 @@ export type {
   GraphStats,
 } from "./graph-store.port.js";
 
+export type {
+  MultiDocumentKBPort,
+  MultiDocSearchResult,
+  MultiDocSearchOptions,
+  EntityLink,
+} from "./multi-doc.port.js";
+
 export interface Page {
   pageNumber: number;
   content: string;
