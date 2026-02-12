@@ -16,6 +16,7 @@ export type IndexEventCallback = (event: {
 export class IncrementalIndexer {
   private subscriptions: Unsubscribe[] = [];
   private listeners: IndexEventCallback[] = [];
+  private pendingOps = new Map<string, Promise<void>>();
 
   constructor(
     private readonly multiDoc: MultiDocumentKBPort,
@@ -69,6 +70,15 @@ export class IncrementalIndexer {
   }
 
   private async handleChange(event: ChangeEvent, sourceId: string): Promise<void> {
+    const docId = event.document.id;
+    // Serialize operations per document to prevent race conditions
+    const prev = this.pendingOps.get(docId) ?? Promise.resolve();
+    const op = prev.then(() => this.processChange(event, sourceId));
+    this.pendingOps.set(docId, op);
+    await op;
+  }
+
+  private async processChange(event: ChangeEvent, sourceId: string): Promise<void> {
     const { type, document } = event;
 
     try {
@@ -78,7 +88,6 @@ export class IncrementalIndexer {
         return;
       }
 
-      // added or modified → re-index
       const start = Date.now();
       if (type === 'modified') {
         this.multiDoc.removeKnowledgeBase(document.id);
