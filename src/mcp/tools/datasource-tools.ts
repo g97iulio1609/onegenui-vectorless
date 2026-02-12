@@ -29,6 +29,35 @@ function getMimeType(filePath: string): string {
   return MIME_MAP[ext] ?? 'application/octet-stream';
 }
 
+/** Convert Node.js Buffer to a proper ArrayBuffer (avoids pool sharing) */
+function bufferToArrayBuffer(buf: Buffer): ArrayBuffer {
+  const ab = new ArrayBuffer(buf.byteLength);
+  const view = new Uint8Array(ab);
+  view.set(new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength));
+  return ab;
+}
+
+/** Block private/reserved IP ranges for SSRF protection */
+function isPrivateUrl(url: string): boolean {
+  const parsed = new URL(url);
+  const host = parsed.hostname.replace(/^\[|\]$/g, '');
+  const privatePatterns = [
+    /^127\./, /^10\./, /^172\.(1[6-9]|2\d|3[01])\./, /^192\.168\./,
+    /^169\.254\./, /^0\./, /^::1$/, /^fc00:/i, /^fd/i, /^fe80:/i,
+    /^localhost$/i,
+  ];
+  return privatePatterns.some((p) => p.test(host));
+}
+
+/** Validate file path: must be absolute, no traversal */
+function validateFilePath(filePath: string): string | null {
+  const path = require('node:path');
+  const resolved = path.resolve(filePath);
+  if (resolved.includes('\0')) return 'Path contains null byte';
+  if (filePath !== resolved && filePath.includes('..')) return 'Path traversal not allowed';
+  return null;
+}
+
 export function registerDatasourceTools(server: McpServer, state: McpState): void {
   server.tool(
     'index-file',
@@ -38,6 +67,9 @@ export function registerDatasourceTools(server: McpServer, state: McpState): voi
     },
     async (args) => {
       try {
+        const pathError = validateFilePath(args.path);
+        if (pathError) return errorResult(pathError);
+
         const fs = await import('node:fs/promises');
         const nodePath = await import('node:path');
         const buffer = await fs.readFile(args.path);
@@ -46,7 +78,7 @@ export function registerDatasourceTools(server: McpServer, state: McpState): voi
 
         const { generateKnowledgeBase } = await import('../../index.js');
         const { knowledgeBase } = await generateKnowledgeBase(
-          buffer.buffer as ArrayBuffer, filename, mimeType,
+          bufferToArrayBuffer(buffer), filename, mimeType,
           { model: state.getModel(), extractEntities: true, extractRelations: true, extractKeywords: true },
         );
         state.addKB(knowledgeBase);
@@ -65,10 +97,12 @@ export function registerDatasourceTools(server: McpServer, state: McpState): voi
     'index-url',
     'Fetch and index a web URL into the knowledge base',
     {
-      url: z.string().url().describe('URL to fetch and index'),
+      url: z.string().url().describe('Public URL to fetch and index'),
     },
     async (args) => {
       try {
+        if (isPrivateUrl(args.url)) return errorResult('Private/internal URLs are not allowed.');
+
         const response = await fetch(args.url);
         if (!response.ok) return errorResult(`HTTP ${response.status}: ${response.statusText}`);
 
@@ -78,13 +112,14 @@ export function registerDatasourceTools(server: McpServer, state: McpState): voi
         const textContent = isHtml ? stripHtml(rawContent) : rawContent;
         if (!textContent.trim()) return errorResult('No text content extracted from URL.');
 
-        const buffer = new TextEncoder().encode(textContent);
+        const encoded = new TextEncoder().encode(textContent);
+        const ab = encoded.buffer.slice(encoded.byteOffset, encoded.byteOffset + encoded.byteLength);
         const { generateKnowledgeBase } = await import('../../index.js');
         const parsed = new URL(args.url);
         const filename = parsed.hostname + parsed.pathname.replace(/\//g, '_');
 
         const { knowledgeBase } = await generateKnowledgeBase(
-          buffer.buffer as ArrayBuffer, filename, isHtml ? 'text/html' : 'text/plain',
+          ab, filename, isHtml ? 'text/html' : 'text/plain',
           { model: state.getModel(), extractEntities: true, extractRelations: true, extractKeywords: true },
         );
         state.addKB(knowledgeBase);
