@@ -8,6 +8,14 @@ import { searchCommand } from './commands/search-cmd.js';
 import { askCommand } from './commands/ask-cmd.js';
 import { statsCommand, listCommand } from './commands/stats-cmd.js';
 import { replCommand } from './commands/repl-cmd.js';
+import { hybridCommand } from './commands/hybrid-cmd.js';
+import {
+  graphNeighborsCommand, graphCommunitiesCommand,
+  graphPathCommand, graphEntitiesCommand,
+} from './commands/graph-cmd.js';
+import { exportCommand, importCommand } from './commands/export-cmd.js';
+import { saveSessionCommand, loadSessionCommand } from './commands/session-cmd.js';
+import { urlCommand } from './commands/url-cmd.js';
 
 const program = new Command();
 
@@ -78,6 +86,65 @@ program
   .action(async () => {
     await initModel(program.opts());
     await replCommand();
+  });
+
+program
+  .command('hybrid <query...>')
+  .description('Hybrid BM25 + Graph RRF search')
+  .action(async (queryParts: string[]) => {
+    await hybridCommand(queryParts.join(' '));
+  });
+
+const graphCmd = new Command('graph').description('Graph exploration commands');
+
+graphCmd
+  .command('neighbors <nodeId>')
+  .description('Show neighbors of a graph node')
+  .action((nodeId: string) => { graphNeighborsCommand(nodeId); });
+
+graphCmd
+  .command('communities')
+  .description('Detect and list communities')
+  .action(() => { graphCommunitiesCommand(); });
+
+graphCmd
+  .command('path <from> <to>')
+  .description('Find shortest path between two nodes')
+  .action((from: string, to: string) => { graphPathCommand(from, to); });
+
+graphCmd
+  .command('entities [type]')
+  .description('List entities, optionally filtered by type')
+  .action((type?: string) => { graphEntitiesCommand(type); });
+
+program.addCommand(graphCmd);
+
+program
+  .command('export <file>')
+  .description('Export knowledge bases to JSON file')
+  .action(async (file: string) => { await exportCommand(file); });
+
+program
+  .command('import <file>')
+  .description('Import knowledge bases from JSON file')
+  .action(async (file: string) => { await importCommand(file); });
+
+program
+  .command('save [file]')
+  .description('Save session state to file')
+  .action(async (file?: string) => { await saveSessionCommand(file); });
+
+program
+  .command('load [file]')
+  .description('Load session state from file')
+  .action(async (file?: string) => { await loadSessionCommand(file); });
+
+program
+  .command('url <url>')
+  .description('Index a web URL')
+  .action(async (url: string) => {
+    await initModel(program.opts());
+    await urlCommand(url);
   });
 
 // Default to REPL if no command given

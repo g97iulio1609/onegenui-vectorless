@@ -5,16 +5,34 @@ import { indexCommand } from './index-cmd.js';
 import { searchCommand } from './search-cmd.js';
 import { askCommand } from './ask-cmd.js';
 import { statsCommand, listCommand } from './stats-cmd.js';
+import { hybridCommand } from './hybrid-cmd.js';
+import {
+  graphNeighborsCommand, graphCommunitiesCommand,
+  graphPathCommand, graphEntitiesCommand,
+} from './graph-cmd.js';
+import { exportCommand, importCommand } from './export-cmd.js';
+import { saveSessionCommand, loadSessionCommand } from './session-cmd.js';
+import { urlCommand } from './url-cmd.js';
 
 const HELP = `
 ${chalk.bold('Commands:')}
-  ${chalk.cyan('/index <file>')}     Index a document
-  ${chalk.cyan('/search <query>')}   BM25 search
-  ${chalk.cyan('/ask <question>')}   AI Detective investigation
-  ${chalk.cyan('/stats')}            Show statistics
-  ${chalk.cyan('/list')}             List indexed documents
-  ${chalk.cyan('/help')}             Show this help
-  ${chalk.cyan('/exit')}             Exit REPL
+  ${chalk.cyan('/index <file>')}            Index a document
+  ${chalk.cyan('/search <query>')}          BM25 search
+  ${chalk.cyan('/hybrid <query>')}          Hybrid BM25 + Graph search
+  ${chalk.cyan('/ask <question>')}          AI Detective investigation
+  ${chalk.cyan('/graph neighbors <id>')}    Show graph neighbors
+  ${chalk.cyan('/graph communities')}       Detect communities
+  ${chalk.cyan('/graph path <from> <to>')}  Shortest path
+  ${chalk.cyan('/graph entities [type]')}   List entities
+  ${chalk.cyan('/export <file>')}           Export KBs to JSON
+  ${chalk.cyan('/import <file>')}           Import KBs from JSON
+  ${chalk.cyan('/save [file]')}             Save session state
+  ${chalk.cyan('/load [file]')}             Load session state
+  ${chalk.cyan('/url <url>')}               Index a web URL
+  ${chalk.cyan('/stats')}                   Show statistics
+  ${chalk.cyan('/list')}                    List indexed documents
+  ${chalk.cyan('/help')}                    Show this help
+  ${chalk.cyan('/exit')}                    Exit REPL
 
   ${chalk.dim('Or just type a question to ask the AI Detective.')}
 `;
@@ -61,6 +79,59 @@ export async function replCommand(): Promise<void> {
     if (trimmed.startsWith('/search ')) {
       const query = trimmed.slice(8).trim();
       searchCommand(query);
+      continue;
+    }
+
+    if (trimmed.startsWith('/hybrid ')) {
+      const query = trimmed.slice(8).trim();
+      await hybridCommand(query);
+      continue;
+    }
+
+    if (trimmed.startsWith('/graph ')) {
+      const args = trimmed.slice(7).trim().split(/\s+/);
+      const sub = args[0];
+      if (sub === 'neighbors' && args[1]) {
+        graphNeighborsCommand(args[1]);
+      } else if (sub === 'communities') {
+        graphCommunitiesCommand();
+      } else if (sub === 'path' && args[1] && args[2]) {
+        graphPathCommand(args[1], args[2]);
+      } else if (sub === 'entities') {
+        graphEntitiesCommand(args[1]);
+      } else {
+        console.log(chalk.red('Usage: /graph neighbors|communities|path|entities'));
+      }
+      continue;
+    }
+
+    if (trimmed.startsWith('/export ')) {
+      const file = trimmed.slice(8).trim();
+      await exportCommand(file);
+      continue;
+    }
+
+    if (trimmed.startsWith('/import ')) {
+      const file = trimmed.slice(8).trim();
+      await importCommand(file);
+      continue;
+    }
+
+    if (trimmed.startsWith('/save')) {
+      const file = trimmed.slice(5).trim() || undefined;
+      await saveSessionCommand(file);
+      continue;
+    }
+
+    if (trimmed.startsWith('/load')) {
+      const file = trimmed.slice(5).trim() || undefined;
+      await loadSessionCommand(file);
+      continue;
+    }
+
+    if (trimmed.startsWith('/url ')) {
+      const url = trimmed.slice(5).trim();
+      await urlCommand(url);
       continue;
     }
 
